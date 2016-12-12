@@ -1,0 +1,29 @@
+{
+  "name": "search-index",
+  "version": "1.0.3",
+  "description": "Module to generate the search index using lunr.",
+  "keywords": [
+    "website",
+    "search",
+    "index"
+  ],
+  "license": "MIT",
+  "author": "ML",
+  "main": "index.js",
+  "devDependencies": {
+    "@types/lunr": "^0.5.28",
+    "@types/node": "^0.0.2",
+    "@types/jasmine": "^2.5.38",
+    "@types/vinyl": "^2.0.0",
+    "jasmine": "^2.5.2",
+    "typescript": "^2.1.4",
+    "tslint": "^4.0.2"
+  },
+  "dependencies": {
+    "lunr": "^0.7.2"
+  },
+  "scripts": {
+    "build": "tsc -p ./ts",
+    "test": "tslint --project ./ts && tsc -p ./ts && tsc -p ./spec && jasmine"
+  }
+}
