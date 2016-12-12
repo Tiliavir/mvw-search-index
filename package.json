@@ -25,5 +25,13 @@
   "scripts": {
     "build": "tsc -p ./ts",
     "test": "tslint --project ./ts && tsc -p ./ts && tsc -p ./spec && jasmine"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiliavir/search-index.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tiliavir/search-index/issues"
+  },
+  "homepage": "https://github.com/tiliavir/search-index#readme"
 }
