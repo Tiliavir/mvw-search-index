@@ -1,5 +1,5 @@
 {
-  "name": "search-index",
+  "name": "mvw-search-index",
   "version": "1.0.3",
   "description": "Module to generate the search index using lunr.",
   "keywords": [
@@ -28,10 +28,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tiliavir/search-index.git"
+    "url": "git+https://github.com/tiliavir/mvw-search-index.git"
   },
   "bugs": {
-    "url": "https://github.com/tiliavir/search-index/issues"
+    "url": "https://github.com/tiliavir/mvw-search-index/issues"
   },
-  "homepage": "https://github.com/tiliavir/search-index#readme"
+  "homepage": "https://github.com/tiliavir/mvw-search-index#readme"
 }
