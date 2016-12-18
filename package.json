@@ -1,6 +1,6 @@
 {
   "name": "mvw-search-index",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Module to generate the search index using lunr.",
   "keywords": [
     "website",
@@ -8,13 +8,18 @@
     "index"
   ],
   "license": "MIT",
-  "author": "ML",
-  "main": "index.js",
+  "author": {
+    "name": "tiliavir",
+    "email": "tiliavir@gmail.com"
+  },
+  "main": "js/index.js",
+  "types": "js/index.d.ts",
   "devDependencies": {
     "@types/lunr": "^0.5.28",
     "@types/node": "^0.0.2",
     "@types/jasmine": "^2.5.38",
     "@types/vinyl": "^2.0.0",
+
     "jasmine": "^2.5.2",
     "typescript": "^2.1.4",
     "tslint": "^4.0.2"
