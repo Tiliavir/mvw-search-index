@@ -16,13 +16,13 @@
   "types": "js/index.d.ts",
   "devDependencies": {
     "@types/lunr": "^0.5.28",
-    "@types/node": "^0.0.2",
-    "@types/jasmine": "^2.5.38",
+    "@types/node": "^7.0.5",
+    "@types/jasmine": "^2.5.41",
     "@types/vinyl": "^2.0.0",
 
-    "jasmine": "^2.5.2",
-    "typescript": "^2.1.4",
-    "tslint": "^4.0.2"
+    "jasmine": "^2.5.3",
+    "typescript": "^2.1.5",
+    "tslint": "^4.4.2"
   },
   "dependencies": {
     "lunr": "^0.7.2"
