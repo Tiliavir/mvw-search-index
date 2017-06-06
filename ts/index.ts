@@ -11,12 +11,9 @@ export declare interface IFileInformation {
   title: string;
 }
 
-declare interface ISearchIndexDocument {
-  body: string;
-  description: string;
-  href: string;
-  keywords: string;
-  title: string;
+export declare interface IFile {
+    file: File;
+    metadata: IFileInformation;
 }
 
 export declare interface IResultStore {
@@ -26,25 +23,38 @@ export declare interface IResultStore {
   };
 }
 
+declare interface ISearchIndexDocument {
+  body: string;
+  description: string;
+  href: string;
+  keywords: string;
+  title: string;
+}
+
 export class SearchIndex {
   private store: IResultStore;
   private index: lunr.Index;
 
-  public constructor() {
+  public constructor(files: IFile[]) {
     this.store = {};
     this.index = lunr((idx: lunr.Index) => {
-      idx.field("title", { boost: 10 });
-      idx.field("keywords", { boost: 6 });
-      idx.field("description", { boost: 3 });
+      idx.field("title");
+      idx.field("keywords");
+      idx.field("description");
       idx.field("body");
       idx.ref("href");
+
+      files.forEach((file: IFile): void => {
+        idx.add(this. add(file.file, file.metadata));
+      }, idx);
     });
   }
 
-  public add(file: File, metadata: IFileInformation): void {
+  private add(file: File, metadata: IFileInformation): ISearchIndexDocument {
     let data: string = file.contents.toString();
     if (metadata.scope.hasOwnProperty(metadata.referencedFile)) {
-      data += JSON.stringify(metadata.scope[metadata.referencedFile]).replace(/\[|\]|\)|\(|\{|\}|\"|:/g, " ");
+      data += JSON.stringify(metadata.scope[metadata.referencedFile])
+                  .replace(/\[|\]|\)|\(|\{|\}|\"|:/g, " ");
     }
 
     let doc: ISearchIndexDocument = {
@@ -60,7 +70,7 @@ export class SearchIndex {
       title: doc.title
     };
 
-    this.index.add(doc);
+    return doc;
   }
 
   public getResult(): {index: lunr.Index, store: IResultStore} {

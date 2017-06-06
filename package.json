@@ -1,6 +1,6 @@
 {
   "name": "mvw-search-index",
-  "version": "1.0.7",
+  "version": "2.0.0",
   "description": "Module to generate the search index using lunr.",
   "keywords": [
     "website",
@@ -15,17 +15,17 @@
   "main": "js/index.js",
   "types": "js/index.d.ts",
   "devDependencies": {
-    "@types/lunr": "^0.5.28",
-    "@types/node": "^7.0.5",
-    "@types/jasmine": "^2.5.43",
-    "@types/vinyl": "^2.0.0",
+    "@types/lunr": "0.5.29",
+    "@types/node": "7.0.28",
+    "@types/jasmine": "2.5.51",
+    "@types/vinyl": "2.0.0",
 
-    "jasmine": "^2.5.3",
-    "typescript": "^2.2.1",
-    "tslint": "^4.5.1"
+    "jasmine": "2.6.0",
+    "typescript": "2.3.4",
+    "tslint": "5.4.3"
   },
   "dependencies": {
-    "lunr": "^1.0.0"
+    "lunr": "^2.0.4"
   },
   "scripts": {
     "build": "tsc -p ./ts",

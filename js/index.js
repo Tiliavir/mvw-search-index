@@ -1,20 +1,26 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var lunr = require("lunr");
 var SearchIndex = (function () {
-    function SearchIndex() {
+    function SearchIndex(files) {
+        var _this = this;
         this.store = {};
         this.index = lunr(function (idx) {
-            idx.field("title", { boost: 10 });
-            idx.field("keywords", { boost: 6 });
-            idx.field("description", { boost: 3 });
+            idx.field("title");
+            idx.field("keywords");
+            idx.field("description");
             idx.field("body");
             idx.ref("href");
+            files.forEach(function (file) {
+                idx.add(_this.add(file.file, file.metadata));
+            }, idx);
         });
     }
     SearchIndex.prototype.add = function (file, metadata) {
         var data = file.contents.toString();
         if (metadata.scope.hasOwnProperty(metadata.referencedFile)) {
-            data += JSON.stringify(metadata.scope[metadata.referencedFile]).replace(/\[|\]|\)|\(|\{|\}|\"|:/g, " ");
+            data += JSON.stringify(metadata.scope[metadata.referencedFile])
+                .replace(/\[|\]|\)|\(|\{|\}|\"|:/g, " ");
         }
         var doc = {
             body: data,
@@ -27,7 +33,7 @@ var SearchIndex = (function () {
             description: doc.description,
             title: doc.title
         };
-        this.index.add(doc);
+        return doc;
     };
     SearchIndex.prototype.getResult = function () {
         return {

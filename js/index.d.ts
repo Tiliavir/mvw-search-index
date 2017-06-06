@@ -10,6 +10,10 @@ export interface IFileInformation {
     };
     title: string;
 }
+export interface IFile {
+    file: File;
+    metadata: IFileInformation;
+}
 export interface IResultStore {
     [key: string]: {
         title: string;
@@ -19,8 +23,8 @@ export interface IResultStore {
 export declare class SearchIndex {
     private store;
     private index;
-    constructor();
-    add(file: File, metadata: IFileInformation): void;
+    constructor(files: IFile[]);
+    private add(file, metadata);
     getResult(): {
         index: lunr.Index;
         store: IResultStore;
