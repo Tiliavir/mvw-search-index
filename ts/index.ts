@@ -1,20 +1,8 @@
 ﻿import * as fs from "fs";
 import * as File from "vinyl";
+import * as cheerio from "cheerio";
 
 let lunr: any = require ("lunr");
-
-export declare interface IFileInformation {
-  description: string;
-  keywords: string;
-  referencedFile: string;
-  scope: { [filename: string]: any };
-  title: string;
-}
-
-export declare interface IFile {
-    file: File;
-    metadata: IFileInformation;
-}
 
 export declare interface IResultStore {
   [key: string]: {
@@ -23,7 +11,7 @@ export declare interface IResultStore {
   };
 }
 
-declare interface ISearchIndexDocument {
+export declare interface IFileInformation {
   body: string;
   description: string;
   href: string;
@@ -31,11 +19,16 @@ declare interface ISearchIndexDocument {
   title: string;
 }
 
+export declare interface IHtmlFileList {
+  list: File[];
+  bodySelector?: string;
+}
+
 export class SearchIndex {
   private store: IResultStore;
   private index: lunr.Index;
 
-  public constructor(files: IFile[]) {
+  private constructor(files: IFileInformation[]) {
     this.store = {};
     this.index = lunr((idx: lunr.Index) => {
       idx.field("title");
@@ -44,36 +37,39 @@ export class SearchIndex {
       idx.field("body");
       idx.ref("href");
 
-      files.forEach((file: IFile): void => {
-        idx.add(this. add(file.file, file.metadata));
+      files.forEach((info: IFileInformation): void => {
+        this.store[info.href] = {
+          description: info.description,
+          title: info.title
+        };
+        idx.add(info);
       }, idx);
     });
   }
 
-  private add(file: File, metadata: IFileInformation): ISearchIndexDocument {
-    let data: string = file.contents.toString();
-    if (metadata.scope.hasOwnProperty(metadata.referencedFile)) {
-      data += JSON.stringify(metadata.scope[metadata.referencedFile])
-                  .replace(/\[|\]|\)|\(|\{|\}|\"|:/g, " ");
-    }
-
-    let doc: ISearchIndexDocument = {
-      body: data,
-      description: metadata.description,
-      href: metadata.referencedFile,
-      keywords: metadata.keywords,
-      title: metadata.title
-    };
-
-    this.store[doc.href] = {
-      description: doc.description,
-      title: doc.title
-    };
-
-    return doc;
+  public static createFromInfo(files: IFileInformation[]): {index: lunr.Index, store: IResultStore} {
+    return new SearchIndex(files).getResult();
   }
 
-  public getResult(): {index: lunr.Index, store: IResultStore} {
+  public static createFromHtml(files: File[], bodySelector: string = "body"): {index: lunr.Index, store: IResultStore} {
+    let infos: IFileInformation[] = files.map((file) => {
+      let dom: CheerioStatic = cheerio.load(file.contents.toString());
+      let info: IFileInformation = {
+        body: dom(bodySelector || "body").each((elem) => {
+          cheerio(elem).append(" ");
+        }).text().replace(/\s\s+/g, " "),
+        description: dom("meta[name='description']").attr("content"),
+        href: file.stem,
+        keywords: dom("meta[name='keywords']").attr("content"),
+        title: dom("title").text()
+      };
+      return info;
+    });
+
+    return SearchIndex.createFromInfo(infos);
+  }
+
+  private getResult(): {index: lunr.Index, store: IResultStore} {
     return {
       index: this.index,
       store: this.store

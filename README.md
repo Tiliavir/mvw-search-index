@@ -4,4 +4,5 @@
 Small module to generate a [lunr](http://lunrjs.com/) index with result store.
 
 ## Releases
-Reason for major release, v2: API break due to update to lunr 2.0.
+- 2.1.0: renamed `referencedFile` to `href`
+- 2.0: Reason for major release: API break due to update to lunr 2.0.
