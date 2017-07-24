@@ -21,7 +21,7 @@ export interface IHtmlFileList {
 export declare class SearchIndex {
     private store;
     private index;
-    private constructor(files);
+    private constructor();
     static createFromInfo(files: IFileInformation[]): {
         index: lunr.Index;
         store: IResultStore;
