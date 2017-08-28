@@ -30,5 +30,9 @@ export declare class SearchIndex {
         index: lunr.Index;
         store: IResultStore;
     };
+    static createFromGlob(glob: string, bodySelector: string, cb: (index: {
+        index: lunr.Index;
+        store: IResultStore;
+    }) => void): void;
     private getResult();
 }

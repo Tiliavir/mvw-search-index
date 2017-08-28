@@ -1,7 +1,9 @@
 ﻿import * as fs from "fs";
 import * as File from "vinyl";
 import * as cheerio from "cheerio";
+import * as globber from "glob";
 
+let vinylFile: any = require("vinyl-file");
 let lunr: any = require ("lunr");
 
 export declare interface IResultStore {
@@ -67,6 +69,17 @@ export class SearchIndex {
     });
 
     return SearchIndex.createFromInfo(infos);
+  }
+
+  public static createFromGlob(glob: string, bodySelector: string = "body", cb: (index: {index: lunr.Index, store: IResultStore}) => void): void {
+    globber(glob, (err: any, files: string[]): void => {
+      if (err) {
+        throw err;
+      } else {
+        let vfiles: File[] = files.map(file => vinylFile.readSync(file));
+        cb(SearchIndex.createFromHtml(vfiles, bodySelector));
+      }
+    });
   }
 
   private getResult(): {index: lunr.Index, store: IResultStore} {

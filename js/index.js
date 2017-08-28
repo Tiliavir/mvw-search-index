@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var cheerio = require("cheerio");
+var globber = require("glob");
+var vinylFile = require("vinyl-file");
 var lunr = require("lunr");
 var SearchIndex = (function () {
     function SearchIndex(files) {
@@ -40,6 +42,18 @@ var SearchIndex = (function () {
             return info;
         });
         return SearchIndex.createFromInfo(infos);
+    };
+    SearchIndex.createFromGlob = function (glob, bodySelector, cb) {
+        if (bodySelector === void 0) { bodySelector = "body"; }
+        globber(glob, function (err, files) {
+            if (err) {
+                throw err;
+            }
+            else {
+                var vfiles = files.map(function (file) { return vinylFile.readSync(file); });
+                cb(SearchIndex.createFromHtml(vfiles, bodySelector));
+            }
+        });
     };
     SearchIndex.prototype.getResult = function () {
         return {

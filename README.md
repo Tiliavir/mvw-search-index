@@ -4,6 +4,7 @@
 Small module to generate a [lunr](http://lunrjs.com/) index with result store.
 
 ## Releases
+- 2.1.3: added support of glob on API
 - 2.1.1: added cli
 - 2.1.0: renamed `referencedFile` to `href`; allowing to parse HTML files directly
 - 2.0: Reason for major release: API break due to update to lunr 2.0.
@@ -16,8 +17,9 @@ Small module to generate a [lunr](http://lunrjs.com/) index with result store.
 ``` ts
 import { SearchIndex } from "mvw-search-index";
 // ...
-let index = SearchIndex.createFromHtml(files, "main");
+let index = SearchIndex.createFromHtml(files, bodySelector);
 // or: let index = SearchIndex.createFromInfo(info);
+// or: let index = SearchIndex.createFromGlob(glob, bodySelector, cb);
 fs.writeFileSync("index.json", JSON.stringify(index));
 ```
 
@@ -133,4 +135,3 @@ fs.writeFileSync("index.json", JSON.stringify(index));
   </body>
 </html>
 ```
-
