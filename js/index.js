@@ -4,7 +4,7 @@ var cheerio = require("cheerio");
 var globber = require("glob");
 var vinylFile = require("vinyl-file");
 var lunr = require("lunr");
-var SearchIndex = (function () {
+var SearchIndex = /** @class */ (function () {
     function SearchIndex(files) {
         var _this = this;
         this.store = {};
