@@ -8,20 +8,20 @@ var SearchIndex = /** @class */ (function () {
     function SearchIndex(files) {
         var _this = this;
         this.store = {};
-        this.index = lunr(function (idx) {
-            idx.field("title");
-            idx.field("keywords");
-            idx.field("description");
-            idx.field("body");
-            idx.ref("href");
-            files.forEach(function (info) {
-                _this.store[info.href] = {
-                    description: info.description,
-                    title: info.title
-                };
-                idx.add(info);
-            }, idx);
-        });
+        var builder = new lunr.Builder();
+        builder.field("title");
+        builder.field("keywords");
+        builder.field("description");
+        builder.field("body");
+        builder.ref("href");
+        files.forEach(function (info) {
+            _this.store[info.href] = {
+                description: info.description,
+                title: info.title
+            };
+            builder.add(info);
+        }, builder);
+        this.index = builder.build();
     }
     SearchIndex.createFromInfo = function (files) {
         return new SearchIndex(files).getResult();

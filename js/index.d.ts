@@ -18,21 +18,16 @@ export interface IHtmlFileList {
     list: File[];
     bodySelector?: string;
 }
+export interface ISearchIndexResult {
+    index: lunr.Index;
+    store: IResultStore;
+}
 export declare class SearchIndex {
     private store;
     private index;
     private constructor();
-    static createFromInfo(files: IFileInformation[]): {
-        index: lunr.Index;
-        store: IResultStore;
-    };
-    static createFromHtml(files: File[], bodySelector?: string): {
-        index: lunr.Index;
-        store: IResultStore;
-    };
-    static createFromGlob(glob: string, bodySelector: string, cb: (index: {
-        index: lunr.Index;
-        store: IResultStore;
-    }) => void): void;
+    static createFromInfo(files: IFileInformation[]): ISearchIndexResult;
+    static createFromHtml(files: File[], bodySelector?: string): ISearchIndexResult;
+    static createFromGlob(glob: string, bodySelector: string, cb: (index: ISearchIndexResult) => void): void;
     private getResult();
 }

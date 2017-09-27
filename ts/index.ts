@@ -26,34 +26,39 @@ export declare interface IHtmlFileList {
   bodySelector?: string;
 }
 
+export declare interface ISearchIndexResult {
+  index: lunr.Index;
+  store: IResultStore;
+}
+
 export class SearchIndex {
   private store: IResultStore;
   private index: lunr.Index;
 
   private constructor(files: IFileInformation[]) {
     this.store = {};
-    this.index = lunr((idx: lunr.Index) => {
-      idx.field("title");
-      idx.field("keywords");
-      idx.field("description");
-      idx.field("body");
-      idx.ref("href");
+    let builder: lunr.Builder = new lunr.Builder();
+    builder.field("title");
+    builder.field("keywords");
+    builder.field("description");
+    builder.field("body");
+    builder.ref("href");
 
-      files.forEach((info: IFileInformation): void => {
-        this.store[info.href] = {
-          description: info.description,
-          title: info.title
-        };
-        idx.add(info);
-      }, idx);
-    });
+    files.forEach((info: IFileInformation): void => {
+      this.store[info.href] = {
+        description: info.description,
+        title: info.title
+      };
+      builder.add(info);
+    }, builder);
+    this.index = builder.build();
   }
 
-  public static createFromInfo(files: IFileInformation[]): {index: lunr.Index, store: IResultStore} {
+  public static createFromInfo(files: IFileInformation[]): ISearchIndexResult {
     return new SearchIndex(files).getResult();
   }
 
-  public static createFromHtml(files: File[], bodySelector: string = "body"): {index: lunr.Index, store: IResultStore} {
+  public static createFromHtml(files: File[], bodySelector: string = "body"): ISearchIndexResult {
     let infos: IFileInformation[] = files.map((file) => {
       let dom: CheerioStatic = cheerio.load(file.contents.toString());
       let info: IFileInformation = {
@@ -71,7 +76,7 @@ export class SearchIndex {
     return SearchIndex.createFromInfo(infos);
   }
 
-  public static createFromGlob(glob: string, bodySelector: string = "body", cb: (index: {index: lunr.Index, store: IResultStore}) => void): void {
+  public static createFromGlob(glob: string, bodySelector: string = "body", cb: (index: ISearchIndexResult) => void): void {
     globber(glob, (err: any, files: string[]): void => {
       if (err) {
         throw err;
@@ -82,7 +87,7 @@ export class SearchIndex {
     });
   }
 
-  private getResult(): {index: lunr.Index, store: IResultStore} {
+  private getResult(): ISearchIndexResult {
     return {
       index: this.index,
       store: this.store
