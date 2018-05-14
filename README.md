@@ -4,7 +4,7 @@
 Small module to generate a [lunr](http://lunrjs.com/) index with result store.
 
 ## Releases
-- 2.1.4 - 2.1.8: dependency update
+- 2.1.4 - 2.1.10: dependency update
 - 2.1.3: added support of glob on API
 - 2.1.1: added cli
 - 2.1.0: renamed `referencedFile` to `href`; allowing to parse HTML files directly
