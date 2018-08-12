@@ -1,24 +1,23 @@
-/// <reference types="vinyl" />
 /// <reference types="lunr" />
 import * as File from "vinyl";
-export interface IResultStore {
+export declare interface IResultStore {
     [key: string]: {
         title: string;
         description: string;
     };
 }
-export interface IFileInformation {
+export declare interface IFileInformation {
     body: string;
     description: string;
     href: string;
     keywords: string;
     title: string;
 }
-export interface IHtmlFileList {
+export declare interface IHtmlFileList {
     list: File[];
     bodySelector?: string;
 }
-export interface ISearchIndexResult {
+export declare interface ISearchIndexResult {
     index: lunr.Index;
     store: IResultStore;
 }
@@ -29,5 +28,5 @@ export declare class SearchIndex {
     static createFromInfo(files: IFileInformation[]): ISearchIndexResult;
     static createFromHtml(files: File[], bodySelector?: string): ISearchIndexResult;
     static createFromGlob(glob: string, bodySelector: string, cb: (index: ISearchIndexResult) => void): void;
-    private getResult();
+    private getResult;
 }
