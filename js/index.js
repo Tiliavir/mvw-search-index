@@ -17,7 +17,7 @@ var SearchIndex = /** @class */ (function () {
         files.forEach(function (info) {
             _this.store[info.href] = {
                 description: info.description,
-                title: info.title
+                title: info.title,
             };
             builder.add(info);
         }, builder);
@@ -37,7 +37,7 @@ var SearchIndex = /** @class */ (function () {
                 description: dom("meta[name='description']").attr("content"),
                 href: file.stem,
                 keywords: dom("meta[name='keywords']").attr("content"),
-                title: dom("title").text()
+                title: dom("title").text(),
             };
             return info;
         });
@@ -58,7 +58,7 @@ var SearchIndex = /** @class */ (function () {
     SearchIndex.prototype.getResult = function () {
         return {
             index: this.index,
-            store: this.store
+            store: this.store,
         };
     };
     return SearchIndex;

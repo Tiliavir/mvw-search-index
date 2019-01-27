@@ -22,11 +22,11 @@ export declare interface ISearchIndexResult {
     store: IResultStore;
 }
 export declare class SearchIndex {
-    private store;
-    private index;
-    private constructor();
     static createFromInfo(files: IFileInformation[]): ISearchIndexResult;
     static createFromHtml(files: File[], bodySelector?: string): ISearchIndexResult;
     static createFromGlob(glob: string, bodySelector: string, cb: (index: ISearchIndexResult) => void): void;
+    private store;
+    private index;
+    private constructor();
     private getResult;
 }
