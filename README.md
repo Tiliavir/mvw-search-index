@@ -1,6 +1,5 @@
 # Lunr Search Index
 
-[![Build Status](https://travis-ci.com/Tiliavir/mvw-search-index.svg?branch=master)](https://travis-ci.com/tiliavir/mvw-search-index)
 [![NPM version](https://img.shields.io/npm/v/mvw-search-index.svg?style=flat)](https://www.npmjs.com/package/mvw-search-index)
 
 ## About
