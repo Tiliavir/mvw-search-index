@@ -23,7 +23,7 @@
     "@types/glob": "7.1.1",
     "@types/lunr": "2.3.2",
     "@types/node": "12.7.5",
-    "@types/jasmine": "3.4.0",
+    "@types/jasmine": "3.4.4",
     "@types/vinyl": "2.0.3",
     "jasmine": "3.5.0",
     "typescript": "3.6.3",
