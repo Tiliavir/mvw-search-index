@@ -1,0 +1,33 @@
+name: Update Dependencies
+on:
+  schedule:
+    - cron:  '0 4 * * 6'
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Update dependencies
+        id: vars
+        run: |
+          npm install -g npm-check-updates
+          ncu -u
+          npm install
+          npm run build
+          npm run test
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v1.5.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_MESSAGE: update dependencies
+          COMMIT_AUTHOR_EMAIL: tiliavir@gmail.com
+          COMMIT_AUTHOR_NAME: Markus Lindenmann
+          PULL_REQUEST_TITLE: Automated Dependency Updates
+          PULL_REQUEST_BODY: This is an auto-generated PR with dependency updates.
+          PULL_REQUEST_LABELS: dependencies
+          PULL_REQUEST_REVIEWERS: tiliavir
+          PULL_REQUEST_BRANCH: dependencies/
+          BRANCH_SUFFIX: none

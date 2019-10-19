@@ -1,5 +1,8 @@
 # Lunr Search Index
 
+[![Build State](https://github.com/Tiliavir/mvw-search-index/workflows/Node%20CI/badge.svg)](https://github.com/Tiliavir/mvw-search-index/actions)
+[![NPM version](https://img.shields.io/npm/v/mvw-search-index.svg?style=flat)](https://www.npmjs.com/package/mvw-search-index)
+
 ## About
 Small module to generate a [lunr](http://lunrjs.com/) index with result store.
 
