@@ -1,7 +1,7 @@
 name: Update Dependencies
 on:
   schedule:
-    - cron:  '0 4 * * 6'
+    - cron:  '30 17 * * 2'
 jobs:
   update-deps:
     runs-on: ubuntu-latest
@@ -29,5 +29,5 @@ jobs:
           PULL_REQUEST_BODY: This is an auto-generated PR with dependency updates.
           PULL_REQUEST_LABELS: dependencies
           PULL_REQUEST_REVIEWERS: tiliavir
-          PULL_REQUEST_BRANCH: dependencies/
-          BRANCH_SUFFIX: none
+          PULL_REQUEST_BRANCH: dependencies
+          BRANCH_SUFFIX: timestamp
