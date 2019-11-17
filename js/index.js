@@ -30,7 +30,7 @@ var SearchIndex = /** @class */ (function () {
         if (bodySelector === void 0) { bodySelector = "body"; }
         var infos = files.map(function (file) {
             var dom = cheerio.load(file.contents.toString());
-            var info = {
+            return {
                 body: dom(bodySelector || "body").each(function (elem) {
                     cheerio(elem).append(" ");
                 }).text().replace(/\s\s+/g, " "),
@@ -39,7 +39,6 @@ var SearchIndex = /** @class */ (function () {
                 keywords: dom("meta[name='keywords']").attr("content"),
                 title: dom("title").text(),
             };
-            return info;
         });
         return SearchIndex.createFromInfo(infos);
     };

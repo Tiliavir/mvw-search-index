@@ -38,16 +38,15 @@ export class SearchIndex {
   public static createFromHtml(files: File[], bodySelector: string = "body"): ISearchIndexResult {
     const infos: IFileInformation[] = files.map((file) => {
       const dom: CheerioStatic = cheerio.load(file.contents.toString());
-      const info: IFileInformation = {
-        body: dom(bodySelector || "body").each((elem) => {
-          cheerio(elem).append(" ");
-        }).text().replace(/\s\s+/g, " "),
-        description: dom("meta[name='description']").attr("content"),
-        href: file.stem,
-        keywords: dom("meta[name='keywords']").attr("content"),
-        title: dom("title").text(),
+      return {
+          body: dom(bodySelector || "body").each((elem) => {
+              cheerio(elem).append(" ");
+          }).text().replace(/\s\s+/g, " "),
+          description: dom("meta[name='description']").attr("content"),
+          href: file.stem,
+          keywords: dom("meta[name='keywords']").attr("content"),
+          title: dom("title").text(),
       };
-      return info;
     });
 
     return SearchIndex.createFromInfo(infos);
