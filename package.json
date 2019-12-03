@@ -18,7 +18,7 @@
   "main": "js/index.js",
   "types": "js/index.d.ts",
   "devDependencies": {
-    "@types/cheerio": "0.22.14",
+    "@types/cheerio": "0.22.15",
     "@types/commander": "2.12.2",
     "@types/glob": "7.1.1",
     "@types/lunr": "2.3.2",
