@@ -22,11 +22,11 @@
     "@types/commander": "2.12.2",
     "@types/glob": "7.1.1",
     "@types/lunr": "2.3.2",
-    "@types/node": "13.7.4",
+    "@types/node": "13.7.7",
     "@types/jasmine": "3.5.7",
     "@types/vinyl": "2.0.4",
     "jasmine": "3.5.0",
-    "typescript": "3.8.2",
+    "typescript": "3.8.3",
     "tslint": "6.0.0"
   },
   "dependencies": {
