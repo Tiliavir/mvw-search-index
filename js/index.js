@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SearchIndex = void 0;
 var cheerio = require("cheerio");
 var globber = require("glob");
 var vinylFile = require("vinyl-file");
