@@ -1,0 +1,31 @@
+name: Pull Request
+
+on: pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm ci, build, test and validate
+        run: |
+          npm ci
+          npm run build
+          npm test
+      - name: commit
+        run: |
+          git config user.email "tiliavir@users.noreply.github.com"
+          git config user.name "tiliavir"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
+          git checkout $GITHUB_HEAD_REF
+          git commit -am "Rebuild changes"
+          git push
