@@ -1,6 +1,6 @@
 {
   "name": "mvw-search-index",
-  "version": "2.1.17",
+  "version": "2.1.18",
   "description": "Module to generate the search index using lunr.",
   "keywords": [
     "website",
