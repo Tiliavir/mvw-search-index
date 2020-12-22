@@ -20,11 +20,6 @@ export declare interface IFileInformation {
   title: string;
 }
 
-export declare interface IHtmlFileList {
-  list: File[];
-  bodySelector?: string;
-}
-
 export declare interface ISearchIndexResult {
   index: lunr.Index;
   store: IResultStore;
@@ -37,7 +32,7 @@ export class SearchIndex {
 
   public static createFromHtml(files: File[], bodySelector: string = "body"): ISearchIndexResult {
     const infos: IFileInformation[] = files.map((file) => {
-      const dom: CheerioStatic = cheerio.load(file.contents.toString());
+      const dom = cheerio.load(file.contents.toString());
       return {
           body: dom(bodySelector || "body").each((elem) => {
               cheerio(elem).append(" ");

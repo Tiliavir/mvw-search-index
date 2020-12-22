@@ -13,10 +13,6 @@ export declare interface IFileInformation {
     keywords: string;
     title: string;
 }
-export declare interface IHtmlFileList {
-    list: File[];
-    bodySelector?: string;
-}
 export declare interface ISearchIndexResult {
     index: lunr.Index;
     store: IResultStore;
