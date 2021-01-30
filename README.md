@@ -9,8 +9,11 @@ Small module to generate a [lunr](http://lunrjs.com/) index with result store.
 Can e.g. be used to generate a search index for a static website, generated with hugo, jekyll,  gatsby or manually.
 
 ## Usage
-First you have to create the index that you than use on e.g. a search page.
-Both is demonstrated with examples in the following two sub chapters.
+First you have to install this package, the create the index that you than use on e.g. a search page.
+Find samples for everything in the following chapters.
+
+### Installation
+Use `npm install --save-dev mvw-search-index` to add the dependency to your `package.json`.
 
 ### Index creation
 There are multiple possibilities to generate the script. Some are demonstrated in the following sub chapters:
@@ -19,7 +22,20 @@ There are multiple possibilities to generate the script. Some are demonstrated i
 - From nodejs
 
 #### From CLI
+`mvw-search-index <glob> <destination> [css-selector]`
+
+Foe example:
 `mvw-search-index ./build/**/*.html ./build/index.json`
+
+Or from an npm script e.g. for a hugo page (has to be executed after page creation, obviously):
+
+```json
+{
+  "scripts": {
+    "index": "mvw-search-index './public/**/*.html' './static/suche/index.json' 'main'"
+  }
+}
+```
 
 #### From TypeSript
 ``` ts
@@ -32,7 +48,6 @@ fs.writeFileSync("index.json", JSON.stringify(index));
 ```
 
 ### From nodejs
-Use `npm install --save-dev mvw-search-index` to add the dependency to your `package.json`. Then add a nodejs script like the following:
 ```js
 "use strict";
 
