@@ -1,11 +1,16 @@
 {
   "name": "mvw-search-index",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Module to generate the search index using lunr.",
   "keywords": [
     "website",
     "search",
-    "index"
+    "index",
+    "lunr",
+    "static",
+    "hugo",
+    "jekyll",
+    "gatsby"
   ],
   "license": "MIT",
   "author": {
