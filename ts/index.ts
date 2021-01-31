@@ -32,6 +32,7 @@ export class SearchIndex {
 
   public static createFromHtml(files: File[], bodySelector: string = "body"): ISearchIndexResult {
     const infos: IFileInformation[] = files.map((file) => {
+      console.info(file.path);
       const dom = cheerio.load(file.contents.toString());
       return {
           body: dom(bodySelector || "body").each((elem) => {
@@ -60,8 +61,8 @@ export class SearchIndex {
     });
   }
 
-  private store: IResultStore;
-  private index: lunr.Index;
+  private readonly store: IResultStore;
+  private readonly index: lunr.Index;
 
   private constructor(files: IFileInformation[]) {
     this.store = {};
