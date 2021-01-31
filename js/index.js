@@ -30,6 +30,7 @@ var SearchIndex = /** @class */ (function () {
     SearchIndex.createFromHtml = function (files, bodySelector) {
         if (bodySelector === void 0) { bodySelector = "body"; }
         var infos = files.map(function (file) {
+            console.info(file.path);
             var dom = cheerio.load(file.contents.toString());
             return {
                 body: dom(bodySelector || "body").each(function (elem) {

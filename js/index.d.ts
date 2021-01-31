@@ -21,8 +21,8 @@ export declare class SearchIndex {
     static createFromInfo(files: IFileInformation[]): ISearchIndexResult;
     static createFromHtml(files: File[], bodySelector?: string): ISearchIndexResult;
     static createFromGlob(glob: string, bodySelector: string, cb: (index: ISearchIndexResult) => void): void;
-    private store;
-    private index;
+    private readonly store;
+    private readonly index;
     private constructor();
     private getResult;
 }
