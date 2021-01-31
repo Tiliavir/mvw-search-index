@@ -32,14 +32,14 @@ export class SearchIndex {
 
   public static createFromHtml(files: File[], bodySelector: string = "body"): ISearchIndexResult {
     const infos: IFileInformation[] = files.map((file) => {
-      console.info(file.path);
+      console.info(file.relative);
       const dom = cheerio.load(file.contents.toString());
       return {
           body: dom(bodySelector || "body").each((elem) => {
               cheerio(elem).append(" ");
           }).text().replace(/\s\s+/g, " "),
           description: dom("meta[name='description']").attr("content"),
-          href: file.stem,
+          href: file.relative,
           keywords: dom("meta[name='keywords']").attr("content"),
           title: dom("title").text(),
       };
