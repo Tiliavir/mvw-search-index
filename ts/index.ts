@@ -41,7 +41,7 @@ export class SearchIndex {
           description: dom("meta[name='description']").attr("content"),
           href: file.relative,
           keywords: dom("meta[name='keywords']").attr("content"),
-          title: dom("title").text(),
+          title: dom("head title").text(),
       };
     });
 
