@@ -31,7 +31,7 @@
     "@types/jasmine": "3.6.4",
     "@types/vinyl": "2.0.4",
     "jasmine": "3.6.4",
-    "typescript": "4.1.5",
+    "typescript": "4.2.2",
     "tslint": "6.1.3"
   },
   "dependencies": {
@@ -39,7 +39,7 @@
     "commander": "~7.1.0",
     "glob": "~7.1.6",
     "lunr": "~2.3.9",
-    "npm-check-updates": "^11.1.8",
+    "npm-check-updates": "^11.1.10",
     "vinyl": "~2.2.1",
     "vinyl-file": "~3.0.0"
   },
