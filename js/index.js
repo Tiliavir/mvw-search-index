@@ -45,7 +45,6 @@ var SearchIndex = /** @class */ (function () {
         return SearchIndex.createFromInfo(infos);
     };
     SearchIndex.createFromGlob = function (glob, bodySelector, cb) {
-        if (bodySelector === void 0) { bodySelector = "body"; }
         globber(glob, function (err, files) {
             if (err) {
                 throw err;

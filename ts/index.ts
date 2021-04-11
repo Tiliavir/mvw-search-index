@@ -49,7 +49,7 @@ export class SearchIndex {
   }
 
   public static createFromGlob(glob: string,
-                               bodySelector: string = "body",
+                               bodySelector: string,
                                cb: (index: ISearchIndexResult) => void): void {
     globber(glob, (err: any, files: string[]): void => {
       if (err) {
