@@ -39,7 +39,7 @@
     "commander": "~7.2.0",
     "glob": "~7.1.6",
     "lunr": "~2.3.9",
-    "npm-check-updates": "^11.5.3",
+    "npm-check-updates": "^11.5.10",
     "vinyl": "~2.2.1",
     "vinyl-file": "~3.0.0"
   },
