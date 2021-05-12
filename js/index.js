@@ -33,9 +33,7 @@ var SearchIndex = /** @class */ (function () {
             console.info(file.relative);
             var dom = cheerio.load(file.contents.toString());
             return {
-                body: dom(bodySelector || "body").each(function (elem) {
-                    cheerio(elem).append(" ");
-                }).text().replace(/\s\s+/g, " "),
+                body: dom(bodySelector || "body").text().replace(/\s\s+/g, " "),
                 description: dom("meta[name='description']").attr("content"),
                 href: file.relative,
                 keywords: dom("meta[name='keywords']").attr("content"),
