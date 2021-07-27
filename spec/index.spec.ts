@@ -41,7 +41,7 @@ describe("SearchIndex: test add", () => {
             cwd: "/",
             base: "/test/",
             path: "/test/filename.js",
-            contents: new Buffer(htmlFile)
+            contents: Buffer.from(htmlFile)
         })];
         let result: ISearchIndexResult = SearchIndex.createFromHtml(files);
 
