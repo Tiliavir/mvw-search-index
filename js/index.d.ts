@@ -1,5 +1,5 @@
 /// <reference types="lunr" />
-import * as File from "vinyl";
+/// <reference types="node" />
 export declare interface IResultStore {
     [key: string]: {
         title: string;
@@ -17,12 +17,17 @@ export declare interface ISearchIndexResult {
     index: lunr.Index;
     store: IResultStore;
 }
+declare interface ReadFileWithContents {
+    contents: Buffer;
+    relative: string;
+}
 export declare class SearchIndex {
-    static createFromInfo(files: IFileInformation[]): ISearchIndexResult;
-    static createFromHtml(files: File[], bodySelector?: string): ISearchIndexResult;
-    static createFromGlob(glob: string, bodySelector: string, cb: (index: ISearchIndexResult) => void): void;
     private readonly store;
     private readonly index;
     private constructor();
+    static createFromInfo(files: IFileInformation[]): ISearchIndexResult;
+    static createFromHtml(files: ReadFileWithContents[], bodySelector?: string): ISearchIndexResult;
+    static createFromGlob(glob: string, bodySelector: string, cb: (index: ISearchIndexResult) => void): void;
     private getResult;
 }
+export {};

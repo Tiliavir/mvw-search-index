@@ -1,9 +1,8 @@
 ﻿import * as cheerio from "cheerio";
 import * as globber from "glob";
-import * as File from "vinyl";
+import * as fs from "fs";
 
-const vinylFile: any = require("vinyl-file");
-const lunr: any = require ("lunr");
+const lunr: any = require("lunr");
 
 export declare interface IResultStore {
   [key: string]: {
@@ -25,40 +24,12 @@ export declare interface ISearchIndexResult {
   store: IResultStore;
 }
 
+declare interface ReadFileWithContents {
+  contents: Buffer;
+  relative: string;
+}
+
 export class SearchIndex {
-  public static createFromInfo(files: IFileInformation[]): ISearchIndexResult {
-    return new SearchIndex(files).getResult();
-  }
-
-  public static createFromHtml(files: File[], bodySelector: string = "body"): ISearchIndexResult {
-    const infos: IFileInformation[] = files.map((file) => {
-      console.info(file.relative);
-      const dom = cheerio.load(file.contents.toString());
-      return {
-          body: dom(bodySelector || "body").text().replace(/\s\s+/g, " "),
-          description: dom("meta[name='description']").attr("content"),
-          href: file.relative,
-          keywords: dom("meta[name='keywords']").attr("content"),
-          title: dom("head title").text(),
-      };
-    });
-
-    return SearchIndex.createFromInfo(infos);
-  }
-
-  public static createFromGlob(glob: string,
-                               bodySelector: string,
-                               cb: (index: ISearchIndexResult) => void): void {
-    globber(glob, (err: any, files: string[]): void => {
-      if (err) {
-        throw err;
-      } else {
-        const vfiles: File[] = files.map((file) => vinylFile.readSync(file));
-        cb(SearchIndex.createFromHtml(vfiles, bodySelector));
-      }
-    });
-  }
-
   private readonly store: IResultStore;
   private readonly index: lunr.Index;
 
@@ -79,6 +50,42 @@ export class SearchIndex {
       builder.add(info);
     }, builder);
     this.index = builder.build();
+  }
+
+  public static createFromInfo(files: IFileInformation[]): ISearchIndexResult {
+    return new SearchIndex(files).getResult();
+  }
+
+  public static createFromHtml(files: ReadFileWithContents[], bodySelector: string = "body"): ISearchIndexResult {
+    const infos: IFileInformation[] = files.map((file) => {
+      console.info(file.relative);
+      const dom = cheerio.load(file.contents.toString());
+      return {
+        body: dom(bodySelector || "body").text().replace(/\s\s+/g, " "),
+        href: file.relative,
+        description: dom("meta[name='description']").attr("content"),
+        keywords: dom("meta[name='keywords']").attr("content"),
+        title: dom("head title").text(),
+      };
+    });
+
+    return SearchIndex.createFromInfo(infos);
+  }
+
+  public static createFromGlob(glob: string,
+                               bodySelector: string,
+                               cb: (index: ISearchIndexResult) => void): void {
+    globber(glob, (err: any, files: string[]): void => {
+      if (err) {
+        throw err;
+      } else {
+        const readFiles: ReadFileWithContents[] = files.map((file) => ({
+          relative: file,
+          contents: fs.readFileSync(file)
+        }));
+        cb(SearchIndex.createFromHtml(readFiles, bodySelector));
+      }
+    });
   }
 
   private getResult(): ISearchIndexResult {

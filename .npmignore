@@ -1,5 +1,9 @@
 .editorconfig
 .gitignore
+.idea
+.github
 .vscode
+
 spec
+demo
 ts

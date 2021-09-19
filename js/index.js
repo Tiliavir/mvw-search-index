@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchIndex = void 0;
 var cheerio = require("cheerio");
 var globber = require("glob");
-var vinylFile = require("vinyl-file");
+var fs = require("fs");
 var lunr = require("lunr");
 var SearchIndex = /** @class */ (function () {
     function SearchIndex(files) {
@@ -34,8 +34,8 @@ var SearchIndex = /** @class */ (function () {
             var dom = cheerio.load(file.contents.toString());
             return {
                 body: dom(bodySelector || "body").text().replace(/\s\s+/g, " "),
-                description: dom("meta[name='description']").attr("content"),
                 href: file.relative,
+                description: dom("meta[name='description']").attr("content"),
                 keywords: dom("meta[name='keywords']").attr("content"),
                 title: dom("head title").text(),
             };
@@ -48,8 +48,11 @@ var SearchIndex = /** @class */ (function () {
                 throw err;
             }
             else {
-                var vfiles = files.map(function (file) { return vinylFile.readSync(file); });
-                cb(SearchIndex.createFromHtml(vfiles, bodySelector));
+                var readFiles = files.map(function (file) { return ({
+                    relative: file,
+                    contents: fs.readFileSync(file)
+                }); });
+                cb(SearchIndex.createFromHtml(readFiles, bodySelector));
             }
         });
     };
