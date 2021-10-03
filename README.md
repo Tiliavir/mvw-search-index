@@ -11,7 +11,7 @@ Can e.g. be used to generate a search index for a static website, generated with
 
 ## Usage
 
-First you have to install this package, the create the index that you than use on e.g. a search page. Find samples for
+First you have to install this package, then create the index that you use on e.g. a search page. Find samples for
 everything in the following chapters.
 
 ### Installation
@@ -28,10 +28,14 @@ There are multiple possibilities to generate the script. Some are demonstrated i
 
 #### From CLI
 
-`mvw-search-index <glob> <destination> [css-selector]`
+```bash
+mvw-search-index <glob> <destination> [css-selector]
+```
 
-Foe example:
-`mvw-search-index ./build/**/*.html ./build/index.json`
+For example:
+```bash
+mvw-search-index ./build/**/*.html ./build/index.json
+```
 
 Or from an npm script e.g. for a hugo page (has to be executed after page creation, obviously):
 
@@ -43,18 +47,19 @@ Or from an npm script e.g. for a hugo page (has to be executed after page creati
 }
 ```
 
-#### From TypeSript
+#### From TypeScript
 
-``` ts
+```ts
 import { SearchIndex } from "mvw-search-index";
-// ...
+
 let index = SearchIndex.createFromHtml(files, bodySelector);
 // or: let index = SearchIndex.createFromInfo(info);
 // or: let index = SearchIndex.createFromGlob(glob, bodySelector, cb);
+
 fs.writeFileSync("index.json", JSON.stringify(index));
 ```
 
-### From nodejs
+### From node.js
 
 ```js
 "use strict";
@@ -63,11 +68,12 @@ const index = require("mvw-search-index");
 const fs = require("fs")
 
 index.SearchIndex.createFromGlob("./build/**/*.html",
-  "main",
-  (index) => fs.writeFileSync("./static/suche/index.json", JSON.stringify(index)));
+                                 "main",
+                                 (index) => fs.writeFileSync("./static/suche/index.json",
+                                                             JSON.stringify(index)));
 ```
 
-### Sample usage of the created `index.json`
+### Sample usage of the created index
 
 You can run `npm run serve` from this repository to run the sample site contained in [./demo](./demo).
 
