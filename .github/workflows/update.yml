@@ -27,7 +27,7 @@ jobs:
             committer: GitHub <noreply@github.com>
             author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
             signoff: false
-            base: master
+            base: main
             branch: dependencies
             branch-suffix: timestamp
             delete-branch: true
