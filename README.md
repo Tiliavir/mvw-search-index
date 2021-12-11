@@ -81,6 +81,7 @@ This contains a very basic static website with a search form on the landing page
 
 ## Releases
 
+- 2.2.10 updates dependencies
 - 2.2.9 gets rid of vinyl and provides a demo application
 - 2.1.4 - 2.1.12: dependency update
 - 2.1.3: added support of glob on API
