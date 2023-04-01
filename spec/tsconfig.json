@@ -12,7 +12,6 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "skipLibCheck": true,
-        "suppressImplicitAnyIndexErrors": true,
         "outDir": "./js"
     }
 }

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchIndex = void 0;
 var cheerio = require("cheerio");
-var globber = require("glob");
+var glob_1 = require("glob");
 var fs = require("fs");
 var lunr = require("lunr");
 var SearchIndex = /** @class */ (function () {
@@ -42,18 +42,17 @@ var SearchIndex = /** @class */ (function () {
         });
         return SearchIndex.createFromInfo(infos);
     };
-    SearchIndex.createFromGlob = function (glob, bodySelector, cb) {
-        globber(glob, function (err, files) {
-            if (err) {
-                throw err;
-            }
-            else {
-                var readFiles = files.map(function (file) { return ({
-                    relative: file,
-                    contents: fs.readFileSync(file)
-                }); });
-                cb(SearchIndex.createFromHtml(readFiles, bodySelector));
-            }
+    SearchIndex.createFromGlob = function (pattern, bodySelector, cb) {
+        (0, glob_1.glob)(pattern, {
+            dotRelative: false
+        }).then(function (files) {
+            var readFiles = files.map(function (file) { return ({
+                relative: file,
+                contents: fs.readFileSync(file)
+            }); });
+            cb(SearchIndex.createFromHtml(readFiles, bodySelector));
+        }).catch(function (err) {
+            throw err;
         });
     };
     SearchIndex.prototype.getResult = function () {

@@ -1,5 +1,5 @@
 ﻿import * as cheerio from "cheerio";
-import * as globber from "glob";
+import {glob} from "glob";
 import * as fs from "fs";
 
 const lunr: any = require("lunr");
@@ -72,19 +72,20 @@ export class SearchIndex {
     return SearchIndex.createFromInfo(infos);
   }
 
-  public static createFromGlob(glob: string,
+  public static createFromGlob(pattern: string,
                                bodySelector: string,
                                cb: (index: ISearchIndexResult) => void): void {
-    globber(glob, (err: any, files: string[]): void => {
-      if (err) {
-        throw err;
-      } else {
+    glob(pattern, {
+      dotRelative: false
+    }).then(files => {
         const readFiles: ReadFileWithContents[] = files.map((file) => ({
           relative: file,
           contents: fs.readFileSync(file)
         }));
         cb(SearchIndex.createFromHtml(readFiles, bodySelector));
       }
+    ).catch(err => {
+      throw err;
     });
   }
 
