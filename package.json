@@ -1,6 +1,6 @@
 {
   "name": "mvw-search-index",
-  "version": "2.2.17",
+  "version": "2.2.18",
   "description": "Module to generate the search index using lunr.",
   "keywords": [
     "website",
@@ -24,12 +24,13 @@
   "types": "js/index.d.ts",
   "devDependencies": {
     "@types/cheerio": "0.22.35",
-    "@types/commander": "2.12.2",
     "@types/jasmine": "5.1.4",
     "@types/lunr": "2.3.7",
     "@types/node": "20.14.1",
+    "@typescript-eslint/eslint-plugin": "7.13.0",
+    "@typescript-eslint/parser": "7.13.0",
     "jasmine": "5.1.0",
-    "tslint": "6.1.3",
+    "eslint": "8.57.0",
     "typescript": "5.4.5",
     "serve": "^14.2.3",
     "npm-check-updates": "^16.14.20"
@@ -42,7 +43,7 @@
   },
   "scripts": {
     "build": "tsc -p ./ts",
-    "test": "tslint --project ./ts && tsc -p ./ts && tsc -p ./spec && jasmine",
+    "test": "npx eslint . --ext .ts && npm run build && tsc -p ./spec && jasmine",
     "preserve": "cd demo && node ../js/cli.js './**/*.html' index.json 'body.to-be-indexed'",
     "serve": "serve ./demo"
   },

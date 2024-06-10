@@ -1,8 +1,8 @@
 ﻿import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
+import * as lunr from "lunr";
 
-const lunr: any = require("lunr");
 
 export declare interface IResultStore {
   [key: string]: {
