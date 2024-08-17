@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import * as lunr from "lunr";
 export declare interface IResultStore {
     [key: string]: {
