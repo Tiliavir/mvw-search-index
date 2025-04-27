@@ -44,8 +44,8 @@
   "scripts": {
     "build": "tsc -p ./ts",
     "test": "npx eslint . && npm run build && tsc -p ./spec && jasmine",
-    "preserve": "cd demo && node ../js/cli.js './**/*.html' index.json 'body.to-be-indexed'",
-    "serve": "serve ./demo"
+    "preserve": "cd docs && node ../js/cli.js './**/*.html' index.json 'body.to-be-indexed'",
+    "serve": "serve docs"
   },
   "repository": {
     "type": "git",

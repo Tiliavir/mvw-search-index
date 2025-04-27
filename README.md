@@ -1,43 +1,58 @@
-# Lunr Search Index
+# mvw-search-index
 
 [![Build State](https://github.com/Tiliavir/mvw-search-index/workflows/Node%20CI/badge.svg)](https://github.com/Tiliavir/mvw-search-index/actions)
 [![NPM version](https://img.shields.io/npm/v/mvw-search-index.svg?style=flat)](https://www.npmjs.com/package/mvw-search-index)
+[![license](https://img.shields.io/npm/l/mvw-search-index.svg)](https://github.com/Tiliavir/mvw-search-index/blob/main/LICENSE)
+
+---
 
 ## About
 
-Small module to generate a [lunr](http://lunrjs.com/) index with result store.
+**mvw-search-index** is a lightweight tool for generating a [lunr](http://lunrjs.com/) search index with a result store.
 
-Can e.g. be used to generate a search index for a static website, generated with hugo, jekyll, gatsby or manually.
+It is ideal for adding fast client-side search capabilities to static websites — whether built with Hugo, Jekyll, Gatsby, or even manually.
+
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [From CLI](#from-cli)
+  - [From TypeScript](#from-typescript)
+  - [From Node.js](#from-nodejs)
+- [Demo](#demo)
+- [Releases](#releases)
+
+---
+
+## Installation
+
+Add the package to your project:
+
+```bash
+npm install --save-dev mvw-search-index
+```
+
+---
 
 ## Usage
 
-First you have to install this package, then create the index that you use on e.g. a search page. Find samples for
-everything in the following chapters.
+You can create an index using the command-line interface, directly from TypeScript, or through Node.js.
 
-### Installation
-
-Use `npm install --save-dev mvw-search-index` to add the dependency to your `package.json`.
-
-### Index creation
-
-There are multiple possibilities to generate the script. Some are demonstrated in the following sub chapters:
-
-- From CLI
-- From TypeScript
-- From nodejs
-
-#### From CLI
+### From CLI
 
 ```bash
 mvw-search-index <glob> <destination> [css-selector]
 ```
 
-For example:
+Example:
+
 ```bash
 mvw-search-index ./build/**/*.html ./build/index.json
 ```
 
-Or from an npm script e.g. for a hugo page (has to be executed after page creation, obviously):
+Or from an npm script:
 
 ```json
 {
@@ -47,44 +62,72 @@ Or from an npm script e.g. for a hugo page (has to be executed after page creati
 }
 ```
 
-#### From TypeScript
+> Ensure the indexing step runs after the site is built.
+
+### From TypeScript
 
 ```ts
 import { SearchIndex } from "mvw-search-index";
+import * as fs from "fs";
 
-let index = SearchIndex.createFromHtml(files, bodySelector);
-// or: let index = SearchIndex.createFromInfo(info);
-// or: let index = SearchIndex.createFromGlob(glob, bodySelector, cb);
+const index = SearchIndex.createFromHtml(files, bodySelector);
+// Alternatives:
+// const index = SearchIndex.createFromInfo(info);
+// const index = SearchIndex.createFromGlob(glob, bodySelector, callback);
 
 fs.writeFileSync("index.json", JSON.stringify(index));
 ```
 
-### From node.js
+### From Node.js
 
 ```js
 "use strict";
 
-const index = require("mvw-search-index");
-const fs = require("fs")
+const { SearchIndex } = require("mvw-search-index");
+const fs = require("fs");
 
-index.SearchIndex.createFromGlob("./build/**/*.html",
-                                 "main",
-                                 (index) => fs.writeFileSync("./static/suche/index.json",
-                                                             JSON.stringify(index)));
+SearchIndex.createFromGlob("./build/**/*.html", "main", (index) => {
+  fs.writeFileSync("./static/suche/index.json", JSON.stringify(index));
+});
 ```
 
-### Sample usage of the created index
+---
 
-You can run `npm run serve` from this repository to run the sample site contained in [./demo](./demo).
+## Demo
 
-This contains a very basic static website with a search form on the landing page `index.html`.
+A basic sample site is included and served from [GitHub Pages](https://www.tiliavir.github.io/mvw-search-index).
+
+Start it locally with:
+
+```bash
+npm run serve
+```
+
+This serves the content from [./docs](docs), featuring a simple static site with a search form on `index.html`.
+
+---
 
 ## Releases
-- 2.2.16: updates dependencies
-- 2.2.10: updates dependencies
-- 2.2.9: gets rid of vinyl and provides a demo application
-- 2.1.4: - 2.1.12: dependency update
-- 2.1.3: added support of glob on API
-- 2.1.1: added CLI
-- 2.1.0: renamed `referencedFile` to `href`; allowing to parse HTML files directly
-- 2.0: Reason for major release: API break due to update to lunr 2.0.
+
+- **2.3.0**: Added attribute support for metadata extraction.
+- **2.2.10 - 2.2.16**: Dependency updates.
+- **2.2.9**: Removed `vinyl`; introduced demo application.
+- **2.1.4 – 2.1.12**: Dependency updates.
+- **2.1.3**: Added glob pattern support to the API.
+- **2.1.1**: Introduced CLI.
+- **2.1.0**: Renamed `referencedFile` to `href`; added direct HTML file parsing.
+- **2.0.0**: **Breaking change** — updated to lunr 2.0.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Author
+
+Maintained by [Tiliavir](https://github.com/Tiliavir).
+
+---

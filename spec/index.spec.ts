@@ -55,15 +55,15 @@ describe("SearchIndex: test add", () => {
     const cbObserver = {
       testCallback(result: ISearchIndexResult) {
         expect(result.store).toEqual({
-            'demo/foo.html': {
+            'docs/foo.html': {
               description: 'This is the description of foo.html that will be indexed and used as a summary ;-)',
               title: 'Foo Title'
             },
-            'demo/index.html': {
+            'docs/index.html': {
               description: 'This is the description of the index.html landing page that will be indexed and used as a summary ;-)',
               title: 'Search Page'
             },
-            'demo/sub/index.html': {
+            'docs/sub/index.html': {
               description: 'This is the description of sub/index.html that will be indexed and used as a summary ;-)',
               title: 'Sub Page Title'
             }
@@ -75,7 +75,7 @@ describe("SearchIndex: test add", () => {
 
         let r: lunr.Index.Result[] = lnr.search("IAmUnique");
         expect(r.length).toBe(1);
-        expect(r[0].ref).toBe("demo/foo.html");
+        expect(r[0].ref).toBe("docs/foo.html");
         expect(result.store[r[0].ref].title).toBe("Foo Title");
 
         r = lnr.search("NotToBeFound");
@@ -84,7 +84,7 @@ describe("SearchIndex: test add", () => {
     }
     spyOn(cbObserver, "testCallback");
 
-    SearchIndex.createFromGlob("demo/**/*.html",
+    SearchIndex.createFromGlob("docs/**/*.html",
       "body.to-be-indexed",
       (r) => cbObserver.testCallback(r));
 
