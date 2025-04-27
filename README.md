@@ -95,7 +95,7 @@ SearchIndex.createFromGlob("./build/**/*.html", "main", (index) => {
 
 ## Demo
 
-A basic sample site is included and served from [GitHub Pages](https://www.tiliavir.github.io/mvw-search-index).
+A basic sample site is included and served from [GitHub Pages](https://tiliavir.github.io/mvw-search-index/).
 
 Start it locally with:
 
