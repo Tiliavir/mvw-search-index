@@ -95,7 +95,7 @@
       }
 
       function initialize() {
-        $.getJSON("/index.json", function (data) {
+        $.getJSON("index.json", function (data) {
           index = lunr.Index.load(data.index);
           store = data.store;
           var query = getParameterByName("query") || getParameterByName("q");
