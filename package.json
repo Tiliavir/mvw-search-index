@@ -33,7 +33,7 @@
     "eslint": "9.27.0",
     "typescript": "5.8.3",
     "serve": "^14.2.3",
-    "npm-check-updates": "^17.0.6"
+    "npm-check-updates": "^18.0.1"
   },
   "dependencies": {
     "cheerio": "~1.0.0",
