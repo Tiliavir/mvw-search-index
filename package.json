@@ -30,7 +30,7 @@
     "@typescript-eslint/eslint-plugin": "8.34.0",
     "@typescript-eslint/parser": "8.34.0",
     "jasmine": "5.8.0",
-    "eslint": "9.28.0",
+    "eslint": "9.29.0",
     "typescript": "5.8.3",
     "serve": "^14.2.3"
   },
