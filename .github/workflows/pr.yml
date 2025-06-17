@@ -25,7 +25,7 @@ jobs:
           npm test
 
       - name: Commit and Push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: Rebuild changes
           branch: ${{ github.head_ref }}
