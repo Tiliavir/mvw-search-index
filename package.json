@@ -23,7 +23,7 @@
   "main": "js/index.js",
   "types": "js/index.d.ts",
   "devDependencies": {
-    "@types/cheerio": "0.22.35",
+    "@types/cheerio": "1.0.0",
     "@types/jasmine": "5.1.8",
     "@types/lunr": "2.3.7",
     "@types/node": "24.1.0",
