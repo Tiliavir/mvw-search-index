@@ -26,7 +26,7 @@
     "@types/cheerio": "1.0.0",
     "@types/jasmine": "5.1.9",
     "@types/lunr": "2.3.7",
-    "@types/node": "24.5.2",
+    "@types/node": "24.7.0",
     "@typescript-eslint/eslint-plugin": "8.44.1",
     "@typescript-eslint/parser": "8.44.1",
     "jasmine": "5.11.0",
