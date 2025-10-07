@@ -31,7 +31,7 @@
     "@typescript-eslint/parser": "8.44.1",
     "jasmine": "5.11.0",
     "eslint": "9.36.0",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "serve": "^14.2.3"
   },
   "dependencies": {
