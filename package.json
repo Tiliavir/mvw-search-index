@@ -24,7 +24,7 @@
   "types": "js/index.d.ts",
   "devDependencies": {
     "@types/cheerio": "1.0.0",
-    "@types/jasmine": "5.1.9",
+    "@types/jasmine": "5.1.12",
     "@types/lunr": "2.3.7",
     "@types/node": "24.9.0",
     "@typescript-eslint/eslint-plugin": "8.46.0",
