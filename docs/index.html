@@ -36,55 +36,54 @@
   </style>
 </head>
 
-<body itemscope itemtype="http://schema.org/SearchResultsPage">
+<body>
 <h1>Description</h1>
 <p>This page is used to demonstrate the use of lunr with an index generated with mvw-search-index.</p>
 <p>Use <code>npm run serve</code> to rebuild the <code>index.json</code> and serve this page.</p>
 
-<h1 class="page-header">Search</h1>
+<hr/>
+
 <div>
-  <form itemprop="potentialAction" itemscope itemtype="http://schema.org/SearchAction">
-    <meta content="search.html?q={query}" itemprop="target">
-    <input class="mvw-search-field" itemprop="query-input" name="query" placeholder="Suche..." type="search">
+  <form>
+    <meta content="search.html?q={query}">
+    <input class="mvw-search-field" name="query" placeholder="Search..." type="search">
   </form>
 
   <ol class="results"></ol>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
 <script>
-  var MVW;
+  let MVW;
   (function (MVW) {
-    var Search;
     (function (Search) {
-      var index;
-      var store;
+      let index;
+      let store;
 
-      function handleSearch(e) {
-        var query = $("input.mvw-search-field").val();
-        var result = index.search(query);
-        var resultContainer = $(".results");
+      function handleSearch() {
+        const query = document.querySelector("input.mvw-search-field")?.value;
+        const result = index.search("*" + query + "*"); // lunr by default does full-term matching - hence the *s
+        const resultContainer = document.querySelector(".results");
         if (result.length === 0) {
-          resultContainer.innerHTML("No matches found...");
+          resultContainer.innerHTML = "No matches found...";
         } else {
-          resultContainer.empty();
-          for (var item in result) {
+          resultContainer.innerHTML = "";
+          for (const item in result) {
             if (result.hasOwnProperty(item)) {
-              var ref = result[item].ref;
-              var i = "<li><a href=\"" + ref + "\">" + store[ref].title + "</a><span>" + store[ref].description + "</span></li>";
-              resultContainer.append(i);
+              const ref = result[item].ref;
+              const html = "<li><a href=\"" + ref + "\">" + store[ref].title + "</a><span>" + store[ref].description + "</span></li>";
+              resultContainer.insertAdjacentHTML("beforeend", html);
             }
           }
-          resultContainer.show();
+          resultContainer.style.display = "block";
         }
       }
 
       function getParameterByName(name) {
-        var url = window.location.href;
+        const url = window.location.href;
         name = name.replace(/[\[\]]/g, "\\$&");
-        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-        var results = regex.exec(url);
+        const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+        const results = regex.exec(url);
         if (!results) {
           return null;
         }
@@ -95,26 +94,33 @@
       }
 
       function initialize() {
-        $.getJSON("index.json", function (data) {
-          index = lunr.Index.load(data.index);
-          store = data.store;
-          var query = getParameterByName("query") || getParameterByName("q");
-          var inputField = $("input.mvw-search-field");
-          if (query) {
-            inputField.val(query);
-          }
-          inputField.on("keyup", handleSearch);
-          handleSearch(null);
-        });
+        fetch("index.json")
+          .then((response) => response.json())
+          .then((data) => {
+            index = lunr.Index.load(data.index);
+            store = data.store;
+            const query = getParameterByName("query") || getParameterByName("q");
+            const inputField = document.querySelector("input.mvw-search-field");
+            if (query) {
+              inputField.value = query;
+            }
+            inputField.addEventListener("keyup", handleSearch);
+            handleSearch(null);
+          })
+          .catch((err) => console.error("Failed to load index.json", err));
       }
 
       Search.initialize = initialize;
-    })(Search = MVW.Search || (MVW.Search = {}));
+    })(MVW.Search || (MVW.Search = {}));
   })(MVW || (MVW = {}));
-  $(function () {
-    return MVW.Search.initialize();
+
+  document.addEventListener("DOMContentLoaded", function () {
+    MVW.Search.initialize();
   });
 </script>
+<br/>
+<br/>
+<hr/>
 
 <em>
   This page's body will not be indexed, since it is lacking <code>class="to-be-indexed"</code> specified in the
