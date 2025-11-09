@@ -15,7 +15,7 @@ describe("SearchIndex: test add", () => {
     expect(result.store).toEqual({filename: {description: "test", title: "Hello"}});
     expect(result.index).toBeDefined();
 
-    const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index)));
+    const lnr: lunr.Index = lunr.Index.load(structuredClone(result.index.toJSON()));
     const r: lunr.Index.Result[] = lnr.search("World*");
     expect(r.length).toBe(1);
     expect(r[0].ref).toBe("filename");
@@ -44,7 +44,7 @@ describe("SearchIndex: test add", () => {
     expect(result.store).toEqual({"filename.js": {description: "test", title: "Hello"}});
     expect(result.index).toBeDefined();
 
-    const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index)));
+    const lnr: lunr.Index = lunr.Index.load(structuredClone(result.index.toJSON()));
     const r: lunr.Index.Result[] = lnr.search("World*");
     expect(r.length).toBe(1);
     expect(r[0].ref).toBe("filename.js");
@@ -71,7 +71,7 @@ describe("SearchIndex: test add", () => {
         );
         expect(result.index).toBeDefined();
 
-        const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index)));
+        const lnr: lunr.Index = lunr.Index.load(structuredClone(result.index.toJSON()));
 
         let r: lunr.Index.Result[] = lnr.search("IAmUnique");
         expect(r.length).toBe(1);
