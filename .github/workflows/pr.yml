@@ -31,3 +31,12 @@ jobs:
           branch: ${{ github.head_ref }}
           commit_user_name: tiliavir
           commit_user_email: tiliavir@users.noreply.github.com
+
+      - name: Dependabot Auto Merge
+        if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+          gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GH_ACTION_MERGER_TOKEN }}
