@@ -29,7 +29,7 @@
     "@types/node": "25.0.9",
     "@typescript-eslint/eslint-plugin": "8.53.0",
     "@typescript-eslint/parser": "8.53.1",
-    "jasmine": "5.13.0",
+    "jasmine": "6.0.0",
     "eslint": "9.39.2",
     "typescript": "5.9.3",
     "serve": "14.2.5"
