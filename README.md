@@ -109,7 +109,7 @@ This serves the content from [./docs](docs), featuring a simple static site with
 
 ## Releases
 
-- **2.3.2**: Dependency updates.
+- **2.3.2 – 2.3.6**: Dependency updates.
 - **2.3.0**: Added attribute support for metadata extraction.
 - **2.2.10 - 2.2.16**: Dependency updates.
 - **2.2.9**: Removed `vinyl`; introduced demo application.
