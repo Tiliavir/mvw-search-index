@@ -1,6 +1,6 @@
 {
   "name": "mvw-search-index",
-  "version": "2.3.5",
+  "version": "2.3.6",
   "description": "Module to generate the search index using lunr.",
   "keywords": [
     "website",
@@ -23,7 +23,7 @@
   "main": "js/index.js",
   "types": "js/index.d.ts",
   "devDependencies": {
-    "@types/cheerio": "1.0.0 ",
+    "@types/cheerio": "1.0.0",
     "@types/jasmine": "6.0.0",
     "@types/lunr": "2.3.7",
     "@types/node": "25.2.3",
