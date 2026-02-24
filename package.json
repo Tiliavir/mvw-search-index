@@ -27,7 +27,7 @@
     "@types/jasmine": "6.0.0",
     "@types/lunr": "2.3.7",
     "@types/node": "25.3.0",
-    "@typescript-eslint/eslint-plugin": "8.56.0",
+    "@typescript-eslint/eslint-plugin": "8.56.1",
     "@typescript-eslint/parser": "8.56.1",
     "jasmine": "6.1.0",
     "eslint": "10.0.1",
