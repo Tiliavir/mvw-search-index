@@ -1,22 +1,56 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchIndex = void 0;
-var cheerio = require("cheerio");
-var glob_1 = require("glob");
-var fs = require("fs");
-var lunr = require("lunr");
-var SearchIndex = /** @class */ (function () {
-    function SearchIndex(files) {
-        var _this = this;
+const cheerio = __importStar(require("cheerio"));
+const glob_1 = require("glob");
+const fs = __importStar(require("fs"));
+const lunr = __importStar(require("lunr"));
+class SearchIndex {
+    store;
+    index;
+    constructor(files) {
         this.store = {};
-        var builder = new lunr.Builder();
+        const builder = new lunr.Builder();
         builder.field("title");
         builder.field("keywords");
         builder.field("description");
         builder.field("body");
         builder.ref("href");
-        files.forEach(function (info) {
-            _this.store[info.href] = {
+        files.forEach((info) => {
+            this.store[info.href] = {
                 description: info.description,
                 title: info.title,
             };
@@ -24,14 +58,13 @@ var SearchIndex = /** @class */ (function () {
         }, builder);
         this.index = builder.build();
     }
-    SearchIndex.createFromInfo = function (files) {
+    static createFromInfo(files) {
         return new SearchIndex(files).getResult();
-    };
-    SearchIndex.createFromHtml = function (files, bodySelector) {
-        if (bodySelector === void 0) { bodySelector = "body"; }
-        var infos = files.map(function (file) {
+    }
+    static createFromHtml(files, bodySelector = "body") {
+        const infos = files.map((file) => {
             console.info(file.relative);
-            var dom = cheerio.load(file.contents.toString());
+            const dom = cheerio.load(file.contents.toString());
             return {
                 body: dom(bodySelector || "body").text().replace(/\s\s+/g, " "),
                 href: file.relative,
@@ -41,27 +74,26 @@ var SearchIndex = /** @class */ (function () {
             };
         });
         return SearchIndex.createFromInfo(infos);
-    };
-    SearchIndex.createFromGlob = function (pattern, bodySelector, cb) {
+    }
+    static createFromGlob(pattern, bodySelector, cb) {
         (0, glob_1.glob)(pattern, {
             dotRelative: false
-        }).then(function (files) {
-            var readFiles = files.map(function (file) { return ({
+        }).then(files => {
+            const readFiles = files.map((file) => ({
                 relative: file,
                 contents: fs.readFileSync(file)
-            }); });
+            }));
             cb(SearchIndex.createFromHtml(readFiles, bodySelector));
-        }).catch(function (err) {
+        }).catch(err => {
             throw err;
         });
-    };
-    SearchIndex.prototype.getResult = function () {
+    }
+    getResult() {
         return {
             index: this.index,
             store: this.store,
         };
-    };
-    return SearchIndex;
-}());
+    }
+}
 exports.SearchIndex = SearchIndex;
 //# sourceMappingURL=index.js.map
