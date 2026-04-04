@@ -1,8 +1,6 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "moduleResolution": "node",
-        "target": "es5",
         "outDir": "../js",
         "declaration": true,
         "sourceMap": true,
