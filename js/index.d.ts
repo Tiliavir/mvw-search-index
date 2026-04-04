@@ -2,14 +2,14 @@ import * as lunr from "lunr";
 export declare interface IResultStore {
     [key: string]: {
         title: string;
-        description: string;
+        description: string | undefined;
     };
 }
 export declare interface IFileInformation {
     body: string;
-    description: string;
+    description: string | undefined;
     href: string;
-    keywords: string;
+    keywords: string | undefined;
     title: string;
 }
 export declare interface ISearchIndexResult {

@@ -1,7 +1,8 @@
+import {describe, it, expect} from "vitest";
 import {IFileInformation, ISearchIndexResult, SearchIndex} from "../ts";
 import * as lunr from "lunr";
 
-describe("SearchIndex: test add", () => {
+describe("SearchIndex", () => {
   it("tests that an added item is in the resulting index", () => {
     const meta: IFileInformation[] = [{
       "body": "Hello World!",
@@ -15,7 +16,7 @@ describe("SearchIndex: test add", () => {
     expect(result.store).toEqual({filename: {description: "test", title: "Hello"}});
     expect(result.index).toBeDefined();
 
-    const lnr: lunr.Index = lunr.Index.load(structuredClone(result.index.toJSON()));
+    const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
     const r: lunr.Index.Result[] = lnr.search("World*");
     expect(r.length).toBe(1);
     expect(r[0].ref).toBe("filename");
@@ -36,15 +37,15 @@ describe("SearchIndex: test add", () => {
            </html>
            `;
 
-    const result: ISearchIndexResult = SearchIndex.createFromHtml([({
+    const result: ISearchIndexResult = SearchIndex.createFromHtml([{
       relative: "filename.js",
       contents: Buffer.from(htmlFile)
-    })]);
+    }]);
 
     expect(result.store).toEqual({"filename.js": {description: "test", title: "Hello"}});
     expect(result.index).toBeDefined();
 
-    const lnr: lunr.Index = lunr.Index.load(structuredClone(result.index.toJSON()));
+    const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
     const r: lunr.Index.Result[] = lnr.search("World*");
     expect(r.length).toBe(1);
     expect(r[0].ref).toBe("filename.js");
@@ -52,44 +53,38 @@ describe("SearchIndex: test add", () => {
   });
 
   it("tests that files are read and represented in the resulting index", () => {
-    const cbObserver = {
-      testCallback(result: ISearchIndexResult) {
-        expect(result.store).toEqual({
-            'docs/foo.html': {
-              description: 'This is the description of foo.html that will be indexed and used as a summary ;-)',
-              title: 'Foo Title'
-            },
-            'docs/index.html': {
-              description: 'This is the description of the index.html landing page that will be indexed and used as a summary ;-)',
-              title: 'Search Page'
-            },
-            'docs/sub/index.html': {
-              description: 'This is the description of sub/index.html that will be indexed and used as a summary ;-)',
-              title: 'Sub Page Title'
+    return new Promise<void>((resolve) => {
+      SearchIndex.createFromGlob("docs/**/*.html",
+        "body.to-be-indexed",
+        (result: ISearchIndexResult) => {
+          expect(result.store).toEqual({
+              'docs/foo.html': {
+                description: 'This is the description of foo.html that will be indexed and used as a summary ;-)',
+                title: 'Foo Title'
+              },
+              'docs/index.html': {
+                description: 'This is the description of the index.html landing page that will be indexed and used as a summary ;-)',
+                title: 'Search Page'
+              },
+              'docs/sub/index.html': {
+                description: 'This is the description of sub/index.html that will be indexed and used as a summary ;-)',
+                title: 'Sub Page Title'
+              }
             }
-          }
-        );
-        expect(result.index).toBeDefined();
+          );
+          expect(result.index).toBeDefined();
 
-        const lnr: lunr.Index = lunr.Index.load(structuredClone(result.index.toJSON()));
+          const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
 
-        let r: lunr.Index.Result[] = lnr.search("IAmUnique");
-        expect(r.length).toBe(1);
-        expect(r[0].ref).toBe("docs/foo.html");
-        expect(result.store[r[0].ref].title).toBe("Foo Title");
+          let r: lunr.Index.Result[] = lnr.search("IAmUnique");
+          expect(r.length).toBe(1);
+          expect(r[0].ref).toBe("docs/foo.html");
+          expect(result.store[r[0].ref].title).toBe("Foo Title");
 
-        r = lnr.search("NotToBeFound");
-        expect(r.length).toBe(0);
-      }
-    }
-    spyOn(cbObserver, "testCallback");
-
-    SearchIndex.createFromGlob("docs/**/*.html",
-      "body.to-be-indexed",
-      (r) => cbObserver.testCallback(r));
-
-    setTimeout(() =>
-        expect(cbObserver.testCallback).toHaveBeenCalledTimes(1),
-      100);
+          r = lnr.search("NotToBeFound");
+          expect(r.length).toBe(0);
+          resolve();
+        });
+    });
   });
 });
