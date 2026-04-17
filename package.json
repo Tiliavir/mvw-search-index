@@ -30,7 +30,7 @@
     "@typescript-eslint/parser": "8.58.2",
     "eslint": "10.2.0",
     "serve": "14.2.6",
-    "typescript": "6.0.2",
+    "typescript": "6.0.3",
     "vitest": "4.1.4"
   },
   "dependencies": {
