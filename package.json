@@ -25,7 +25,7 @@
   "devDependencies": {
     "@types/cheerio": "1.0.0",
     "@types/lunr": "2.3.7",
-    "@types/node": "25.8.0",
+    "@types/node": "25.9.0",
     "@typescript-eslint/eslint-plugin": "8.59.3",
     "@typescript-eslint/parser": "8.59.4",
     "eslint": "10.4.0",
