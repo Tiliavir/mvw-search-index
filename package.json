@@ -27,7 +27,7 @@
     "@types/lunr": "2.3.7",
     "@types/node": "26.0.0",
     "@typescript-eslint/eslint-plugin": "8.61.1",
-    "@typescript-eslint/parser": "8.61.1",
+    "@typescript-eslint/parser": "8.62.0",
     "eslint": "10.5.0",
     "serve": "14.2.6",
     "typescript": "6.0.3",
