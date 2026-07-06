@@ -31,7 +31,7 @@
     "eslint": "10.6.0",
     "serve": "14.2.6",
     "typescript": "6.0.3",
-    "vitest": "4.1.9"
+    "vitest": "4.1.10"
   },
   "dependencies": {
     "cheerio": "1.2.0",
