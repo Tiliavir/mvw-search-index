@@ -253,6 +253,13 @@ describe("text processing", () => {
     expect(hits(index(), "Markus")).toBe(1);
   });
 
+  it("splits keywords on commas even without spaces", () => {
+    const index = indexHtml(`<head><meta name="keywords" content="Blasmusik,Konzert;Musikverein"></head>`);
+    for (const word of ["Blasmusik", "Konzert", "Musikverein"]) {
+      expect(hits(index, word), word).toBe(1);
+    }
+  });
+
   it("does not index stop words", () => {
     expect(hits(index(), "the")).toBe(0);
   });

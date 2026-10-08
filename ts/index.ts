@@ -99,7 +99,8 @@ export class SearchIndex {
         description: info.description,
         title: info.title,
       };
-      builder.add(info);
+      // keywords are a comma separated list, but lunr only splits on whitespace and hyphens
+      builder.add({...info, keywords: info.keywords?.replace(/[,;]/g, " ")});
     });
     this.index = builder.build();
   }
