@@ -92,6 +92,20 @@ describe("SearchIndex", () => {
     }
   });
 
+  it("is silent by default and reports progress to a given logger", async () => {
+    const consoleSpy = vi.spyOn(console, "info");
+    const messages: string[] = [];
+    try {
+      await SearchIndex.createFromGlob("docs/foo.html");
+      expect(consoleSpy).not.toHaveBeenCalled();
+
+      await SearchIndex.createFromGlob("docs/foo.html", {logger: {info: (m) => messages.push(m), warn: () => undefined}});
+      expect(messages).toEqual(["Indexing docs/foo.html"]);
+    } finally {
+      consoleSpy.mockRestore();
+    }
+  });
+
   it("rejects when the pattern matches no files", async () => {
     await expect(SearchIndex.createFromGlob("does-not-exist/**/*.html")).rejects.toThrow(/No files match/);
   });

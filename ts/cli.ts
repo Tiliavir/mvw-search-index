@@ -10,7 +10,7 @@ program
   .arguments("<glob> <dest> [bodySelector]")
   .action(async (glob, dest, bodySelector) => {
     try {
-      const index = await SearchIndex.createFromGlob(glob, bodySelector);
+      const index = await SearchIndex.createFromGlob(glob, {bodySelector, logger: console});
       await fs.promises.writeFile(dest, JSON.stringify(index));
     } catch (err) {
       console.error(err instanceof Error ? err.message : err);

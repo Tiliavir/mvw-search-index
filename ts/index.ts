@@ -35,6 +35,17 @@ export declare interface HtmlFile {
 /** @deprecated Use {@link HtmlFile}. */
 export type ReadFileWithContents = HtmlFile;
 
+/** Receives progress and diagnostic messages. `console` satisfies this interface. */
+export declare interface Logger {
+  info(message: string): void;
+  warn(message: string): void;
+}
+
+const silentLogger: Logger = {
+  info: () => undefined,
+  warn: () => undefined,
+};
+
 export declare interface SearchIndexOptions {
   /** CSS selector of the element(s) whose text is indexed as body. Default: `"body"`. */
   bodySelector?: string;
@@ -43,6 +54,8 @@ export declare interface SearchIndexOptions {
    * pattern matches no files. Default: `false`.
    */
   allowEmpty?: boolean;
+  /** Where to report progress (one message per indexed file). Default: silent. */
+  logger?: Logger;
 }
 
 function normalizeOptions(options: string | SearchIndexOptions | undefined): SearchIndexOptions {
@@ -81,9 +94,9 @@ export class SearchIndex {
    * @param options Options, or - for backwards compatibility - just the body selector.
    */
   public static createFromHtml(files: HtmlFile[], options?: string | SearchIndexOptions): ISearchIndexResult {
-    const {bodySelector} = normalizeOptions(options);
+    const {bodySelector, logger = silentLogger} = normalizeOptions(options);
     const infos: IFileInformation[] = files.map((file) => {
-      console.info(file.relative);
+      logger.info(`Indexing ${file.relative}`);
       const dom = cheerio.load(file.contents.toString());
       return {
         body: dom(bodySelector || "body").text().replace(/\s\s+/g, " "),
