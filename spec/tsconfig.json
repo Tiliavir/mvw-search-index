@@ -1,16 +1,8 @@
 {
+  "extends": "../ts/tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "sourceMap": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "removeComments": false,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "types": ["vitest/globals", "node", "lunr"]
+    "rootDir": "..",
+    "noEmit": true
   },
-  "include": ["*.ts", "../ts/**/*.ts"]
+  "include": ["*.ts", "../ts/*.ts"]
 }

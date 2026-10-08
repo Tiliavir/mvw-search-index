@@ -10,7 +10,7 @@ program
   .arguments("<glob> <dest> [bodySelector]")
   .action((glob, dest, bodySelector) => {
     SearchIndex.createFromGlob(glob, bodySelector, (index) =>
-      fs.writeFileSync(dest || "./index.json", JSON.stringify(index)),
+      fs.writeFileSync(dest, JSON.stringify(index)),
     );
   })
   .parse(process.argv);

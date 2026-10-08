@@ -1,15 +1,9 @@
-import tsEsLint from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
+import js from "@eslint/js";
+import { defineConfig, globalIgnores } from "eslint/config";
+import tseslint from "typescript-eslint";
 
-export default [
-  {
-    files: ["**/*.ts"],
-    plugins: {
-      "@typescript-eslint": tsEsLint,
-    },
-
-    languageOptions: {
-      parser: tsParser,
-    }
-  },
-];
+export default defineConfig(
+  globalIgnores(["js/", "docs/", "node_modules/"]),
+  js.configs.recommended,
+  tseslint.configs.recommended,
+);
