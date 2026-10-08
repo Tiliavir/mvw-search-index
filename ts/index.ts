@@ -2,6 +2,9 @@ import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
 import * as lunr from "lunr";
+import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
+
+export {DEFAULT_EXCLUDE_SELECTOR};
 
 
 export declare interface IResultStore {
@@ -50,6 +53,16 @@ export declare interface SearchIndexOptions {
   /** CSS selector of the element(s) whose text is indexed as body. Default: `"body"`. */
   bodySelector?: string;
   /**
+   * CSS selector of elements inside the body to leave out, e.g. navigation and footers
+   * that repeat on every page. Use `""` to exclude nothing. Default: `"nav, footer"`.
+   */
+  excludeSelector?: string;
+  /**
+   * Skip pages with `<meta name="robots" content="noindex">` (or `none`), just like
+   * search engines do. Default: `true`.
+   */
+  respectNoindex?: boolean;
+  /**
    * `createFromGlob` only: resolve with an empty index instead of rejecting when the
    * pattern matches no files. Default: `false`.
    */
@@ -94,18 +107,25 @@ export class SearchIndex {
    * @param options Options, or - for backwards compatibility - just the body selector.
    */
   public static createFromHtml(files: HtmlFile[], options?: string | SearchIndexOptions): ISearchIndexResult {
-    const {bodySelector, logger = silentLogger} = normalizeOptions(options);
-    const infos: IFileInformation[] = files.map((file) => {
-      logger.info(`Indexing ${file.relative}`);
+    const {bodySelector, excludeSelector, respectNoindex = true, logger = silentLogger} = normalizeOptions(options);
+    const infos: IFileInformation[] = [];
+    for (const file of files) {
       const dom = cheerio.load(file.contents.toString());
-      return {
-        body: dom(bodySelector || "body").text().replace(/\s\s+/g, " "),
+      if (respectNoindex && isNoindex(dom)) {
+        logger.info(`Skipping ${file.relative} (robots noindex)`);
+        continue;
+      }
+      logger.info(`Indexing ${file.relative}`);
+      const metadata = extractMetadata(dom);
+      if (!metadata.title) {
+        logger.warn(`${file.relative} has no <title>, og:title or <h1> - its search result will have an empty title`);
+      }
+      infos.push({
+        ...metadata,
+        body: extractText(dom, bodySelector || "body", excludeSelector),
         href: file.relative,
-        description: dom("meta[name='description']").attr("content"),
-        keywords: dom("meta[name='keywords']").attr("content"),
-        title: dom("head title").text(),
-      };
-    });
+      });
+    }
 
     return SearchIndex.createFromInfo(infos);
   }

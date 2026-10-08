@@ -1,6 +1,6 @@
 import {describe, it, expect, vi} from "vitest";
 import * as fs from "fs";
-import {IFileInformation, ISearchIndexResult, SearchIndex} from "../ts";
+import {IFileInformation, ISearchIndexResult, SearchIndex, SearchIndexOptions} from "../ts";
 import * as lunr from "lunr";
 
 describe("SearchIndex", () => {
@@ -130,5 +130,110 @@ describe("SearchIndex", () => {
     const lnr = lunr.Index.load(JSON.parse(JSON.stringify(result.index)));
     expect(lnr.search("inside").length).toBe(1);
     expect(lnr.search("outside").length).toBe(0);
+  });
+});
+
+function indexHtml(html: string, options?: SearchIndexOptions): lunr.Index {
+  const result = SearchIndex.createFromHtml([{relative: "page.html", contents: html}], options);
+  return lunr.Index.load(JSON.parse(JSON.stringify(result.index)));
+}
+
+function hits(index: lunr.Index, query: string): number {
+  return index.search(query).length;
+}
+
+describe("text extraction", () => {
+  it("separates the text of adjacent block elements", () => {
+    const index = indexHtml("<body><ul><li>Trompete</li><li>Posaune</li></ul><h1>Probe</h1><p>Mittwoch<br>Abend</p></body>");
+    for (const word of ["Trompete", "Posaune", "Probe", "Mittwoch", "Abend"]) {
+      expect(hits(index, word), word).toBe(1);
+    }
+  });
+
+  it("does not split words that are only broken up by inline markup", () => {
+    const index = indexHtml("<body><p><strong>B</strong>lasmusik and <a href='#'>Konzert</a>saal</p></body>");
+    expect(hits(index, "Blasmusik")).toBe(1);
+    expect(hits(index, "Konzertsaal")).toBe(1);
+  });
+
+  it("indexes every element matched by the body selector, separated", () => {
+    const index = indexHtml("<body><main>one</main><aside>skip</aside><main>two</main></body>", {bodySelector: "main"});
+    expect(hits(index, "one")).toBe(1);
+    expect(hits(index, "two")).toBe(1);
+    expect(hits(index, "skip")).toBe(0);
+  });
+
+  it("never indexes scripts, styles, noscript and template content", () => {
+    const index = indexHtml(`<body><p>visible</p>
+      <script>var secretFunctionName = 1;</script>
+      <style>.fancyClass { color: red }</style>
+      <noscript>enablejavascript</noscript>
+      <template><p>templatetext</p></template></body>`);
+    expect(hits(index, "visible")).toBe(1);
+    for (const word of ["secretFunctionName", "fancyClass", "enablejavascript", "templatetext"]) {
+      expect(hits(index, word), word).toBe(0);
+    }
+  });
+
+  it("excludes nav and footer by default", () => {
+    const html = "<body><nav>Impressum</nav><main>Jahreskonzert</main><footer>Datenschutz</footer></body>";
+    const index = indexHtml(html);
+    expect(hits(index, "Jahreskonzert")).toBe(1);
+    expect(hits(index, "Impressum")).toBe(0);
+    expect(hits(index, "Datenschutz")).toBe(0);
+  });
+
+  it("supports a custom exclude selector, or none", () => {
+    const html = "<body><nav>Impressum</nav><main>Jahreskonzert <span class='ad'>Werbung</span></main></body>";
+    const custom = indexHtml(html, {excludeSelector: ".ad"});
+    expect(hits(custom, "Werbung")).toBe(0);
+    expect(hits(custom, "Impressum")).toBe(1);
+
+    const none = indexHtml(html, {excludeSelector: ""});
+    expect(hits(none, "Werbung")).toBe(1);
+    expect(hits(none, "Impressum")).toBe(1);
+  });
+
+  it("still indexes a body selector that matches the exclude selector itself", () => {
+    const index = indexHtml("<body><footer>Kontakt</footer></body>", {bodySelector: "footer"});
+    expect(hits(index, "Kontakt")).toBe(1);
+  });
+
+  it("skips pages marked noindex unless told otherwise", () => {
+    const files = [
+      {relative: "public.html", contents: "<head><title>Public</title></head><body>visible</body>"},
+      {relative: "draft.html", contents: "<head><meta name='Robots' content='NOINDEX, follow'><title>Draft</title></head><body>hidden</body>"},
+      {relative: "none.html", contents: "<head><meta name='robots' content='none'><title>None</title></head><body>hidden</body>"},
+    ];
+    expect(Object.keys(SearchIndex.createFromHtml(files).store)).toEqual(["public.html"]);
+    expect(Object.keys(SearchIndex.createFromHtml(files, {respectNoindex: false}).store))
+      .toEqual(["public.html", "draft.html", "none.html"]);
+  });
+});
+
+describe("metadata", () => {
+  const store = (html: string) => SearchIndex.createFromHtml([{relative: "p.html", contents: html}]).store["p.html"];
+
+  it("trims title and description", () => {
+    expect(store(`<head><title>
+        Jahreskonzert   2026
+      </title><meta name="description" content="  Das   Konzert "></head>`))
+      .toEqual({title: "Jahreskonzert 2026", description: "Das Konzert"});
+  });
+
+  it("falls back to Open Graph tags", () => {
+    expect(store(`<head><meta property="og:title" content="OG Title">
+      <meta property="og:description" content="OG description"></head>`))
+      .toEqual({title: "OG Title", description: "OG description"});
+  });
+
+  it("falls back to the first h1 for the title and warns when there is none", () => {
+    expect(store("<body><h1>Heading <small>sub</small></h1><h1>Second</h1></body>").title).toBe("Heading sub");
+
+    const warnings: string[] = [];
+    const result = SearchIndex.createFromHtml([{relative: "p.html", contents: "<body>text</body>"}],
+      {logger: {info: () => undefined, warn: (m) => warnings.push(m)}});
+    expect(result.store["p.html"]).toEqual({title: ""});
+    expect(warnings).toHaveLength(1);
   });
 });
