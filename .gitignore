@@ -1,6 +1,11 @@
-.log
+*.log
 .idea
+.vscode
 
-spec/js/*
+# build output - produced by `npm run build` (also runs on `npm ci` via `prepare`)
+js/
+spec/**/*.js
+spec/**/*.js.map
 
 node_modules
+*.tgz

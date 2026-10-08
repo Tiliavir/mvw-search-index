@@ -22,6 +22,13 @@
   },
   "main": "js/index.js",
   "types": "js/index.d.ts",
+  "files": [
+    "js/**/*.js",
+    "js/**/*.d.ts"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "devDependencies": {
     "@types/cheerio": "1.0.0",
     "@types/lunr": "2.3.7",
@@ -40,6 +47,7 @@
     "lunr": "2.3.9"
   },
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc -p ./ts",
     "test": "npx eslint . && npm run build && npx vitest run",
     "preserve": "cd docs && node ../js/cli.js './**/*.html' index.json 'body.to-be-indexed'",
