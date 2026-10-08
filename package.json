@@ -51,7 +51,7 @@
     "build": "tsc -p ./ts",
     "lint": "eslint . && tsc -p spec",
     "test": "npm run lint && npm run build && vitest run",
-    "preserve": "cd docs && node ../js/cli.js './**/*.html' index.json 'body.to-be-indexed'",
+    "preserve": "node js/cli.js '**/*.html' docs/index.json 'body.to-be-indexed' --cwd docs",
     "serve": "serve docs"
   },
   "repository": {
