@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
 import * as lunr from "lunr";
-import {DEFAULT_EXCLUDE_SELECTOR, extractText} from "./html";
+import {DEFAULT_EXCLUDE_SELECTOR, extractText, isNoindex} from "./html";
 
 export {DEFAULT_EXCLUDE_SELECTOR};
 
@@ -58,6 +58,11 @@ export declare interface SearchIndexOptions {
    */
   excludeSelector?: string;
   /**
+   * Skip pages with `<meta name="robots" content="noindex">` (or `none`), just like
+   * search engines do. Default: `true`.
+   */
+  respectNoindex?: boolean;
+  /**
    * `createFromGlob` only: resolve with an empty index instead of rejecting when the
    * pattern matches no files. Default: `false`.
    */
@@ -102,18 +107,23 @@ export class SearchIndex {
    * @param options Options, or - for backwards compatibility - just the body selector.
    */
   public static createFromHtml(files: HtmlFile[], options?: string | SearchIndexOptions): ISearchIndexResult {
-    const {bodySelector, excludeSelector, logger = silentLogger} = normalizeOptions(options);
-    const infos: IFileInformation[] = files.map((file) => {
-      logger.info(`Indexing ${file.relative}`);
+    const {bodySelector, excludeSelector, respectNoindex = true, logger = silentLogger} = normalizeOptions(options);
+    const infos: IFileInformation[] = [];
+    for (const file of files) {
       const dom = cheerio.load(file.contents.toString());
-      return {
+      if (respectNoindex && isNoindex(dom)) {
+        logger.info(`Skipping ${file.relative} (robots noindex)`);
+        continue;
+      }
+      logger.info(`Indexing ${file.relative}`);
+      infos.push({
         body: extractText(dom, bodySelector || "body", excludeSelector),
         href: file.relative,
         description: dom("meta[name='description']").attr("content"),
         keywords: dom("meta[name='keywords']").attr("content"),
         title: dom("head title").text(),
-      };
-    });
+      });
+    }
 
     return SearchIndex.createFromInfo(infos);
   }

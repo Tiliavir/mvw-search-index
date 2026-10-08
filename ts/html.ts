@@ -20,6 +20,12 @@ export function normalizeWhitespace(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
+/** Whether the page asks search engines not to index it (`<meta name="robots" content="noindex">`). */
+export function isNoindex($: CheerioAPI): boolean {
+  return $("meta[name='robots' i]").toArray()
+    .some((meta) => /\b(noindex|none)\b/i.test($(meta).attr("content") ?? ""));
+}
+
 /** Default for the `excludeSelector` option: site-wide navigation and footers. */
 export const DEFAULT_EXCLUDE_SELECTOR = "nav, footer";
 

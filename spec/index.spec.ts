@@ -198,4 +198,15 @@ describe("text extraction", () => {
     const index = indexHtml("<body><footer>Kontakt</footer></body>", {bodySelector: "footer"});
     expect(hits(index, "Kontakt")).toBe(1);
   });
+
+  it("skips pages marked noindex unless told otherwise", () => {
+    const files = [
+      {relative: "public.html", contents: "<head><title>Public</title></head><body>visible</body>"},
+      {relative: "draft.html", contents: "<head><meta name='Robots' content='NOINDEX, follow'><title>Draft</title></head><body>hidden</body>"},
+      {relative: "none.html", contents: "<head><meta name='robots' content='none'><title>None</title></head><body>hidden</body>"},
+    ];
+    expect(Object.keys(SearchIndex.createFromHtml(files).store)).toEqual(["public.html"]);
+    expect(Object.keys(SearchIndex.createFromHtml(files, {respectNoindex: false}).store))
+      .toEqual(["public.html", "draft.html", "none.html"]);
+  });
 });
