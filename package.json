@@ -30,14 +30,14 @@
     "node": ">=22.12.0"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@types/cheerio": "1.0.0",
     "@types/lunr": "2.3.7",
     "@types/node": "26.6.4",
-    "@typescript-eslint/eslint-plugin": "8.71.0",
-    "@typescript-eslint/parser": "8.71.0",
     "eslint": "10.12.0",
     "serve": "14.2.6",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
     "vitest": "5.0.3"
   },
   "dependencies": {
@@ -49,7 +49,8 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc -p ./ts",
-    "test": "npx eslint . && npm run build && npx vitest run",
+    "lint": "eslint .",
+    "test": "npm run lint && npm run build && vitest run",
     "preserve": "cd docs && node ../js/cli.js './**/*.html' index.json 'body.to-be-indexed'",
     "serve": "serve docs"
   },
