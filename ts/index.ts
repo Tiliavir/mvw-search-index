@@ -1,11 +1,14 @@
 import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
+import * as path from "path";
 import * as lunr from "lunr";
 import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
+import {HrefOptions, toHref} from "./href";
 import {DEFAULT_LANGUAGE, languagePlugin} from "./language";
 
 export {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE};
+export type {HrefOptions};
 
 
 export declare interface IResultStore {
@@ -61,7 +64,7 @@ export const DEFAULT_BOOSTS: Readonly<Record<SearchField, number>> = Object.free
   body: 1,
 });
 
-export declare interface SearchIndexOptions {
+export declare interface SearchIndexOptions extends HrefOptions {
   /** CSS selector of the element(s) whose text is indexed as body. Default: `"body"`. */
   bodySelector?: string;
   /**
@@ -92,6 +95,12 @@ export declare interface SearchIndexOptions {
    * pattern matches no files. Default: `false`.
    */
   allowEmpty?: boolean;
+  /**
+   * `createFromGlob` only: directory the pattern is resolved against. The paths of
+   * the matched files relative to it become the hrefs, so point it at the root of
+   * the built site. Default: `process.cwd()`.
+   */
+  cwd?: string;
   /** Where to report progress (one message per indexed file). Default: silent. */
   logger?: Logger;
 }
@@ -124,6 +133,9 @@ export class SearchIndex {
     builder.ref("href");
 
     files.forEach((info: IFileInformation): void => {
+      if (Object.prototype.hasOwnProperty.call(this.store, info.href)) {
+        throw new Error(`Duplicate href "${info.href}": every document needs a unique href.`);
+      }
       this.store[info.href] = {
         description: info.description,
         title: info.title,
@@ -164,7 +176,7 @@ export class SearchIndex {
       infos.push({
         ...metadata,
         body: extractText(dom, bodySelector || "body", excludeSelector),
-        href: file.relative,
+        href: toHref(file.relative, normalized),
       });
     }
 
@@ -191,15 +203,16 @@ export class SearchIndex {
   }
 
   private static async createFromGlobAsync(pattern: string, options: SearchIndexOptions): Promise<ISearchIndexResult> {
+    const cwd = path.resolve(options.cwd ?? ".");
     // glob's result order depends on the file system - sort for reproducible output
-    const files = (await glob(pattern, {dotRelative: false, nodir: true})).sort();
+    const files = (await glob(pattern, {cwd, dotRelative: false, nodir: true, posix: true})).sort();
     if (files.length === 0 && !options.allowEmpty) {
-      throw new Error(`No files match "${pattern}" (relative to ${process.cwd()}). `
+      throw new Error(`No files match "${pattern}" in ${cwd}. `
         + "Set the allowEmpty option to create an empty index anyway.");
     }
     const readFiles: HtmlFile[] = await Promise.all(files.map(async (file) => ({
       relative: file,
-      contents: await fs.promises.readFile(file),
+      contents: await fs.promises.readFile(path.join(cwd, file)),
     })));
     return SearchIndex.createFromHtml(readFiles, options);
   }
