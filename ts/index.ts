@@ -38,6 +38,11 @@ export type ReadFileWithContents = HtmlFile;
 export declare interface SearchIndexOptions {
   /** CSS selector of the element(s) whose text is indexed as body. Default: `"body"`. */
   bodySelector?: string;
+  /**
+   * `createFromGlob` only: resolve with an empty index instead of rejecting when the
+   * pattern matches no files. Default: `false`.
+   */
+  allowEmpty?: boolean;
 }
 
 function normalizeOptions(options: string | SearchIndexOptions | undefined): SearchIndexOptions {
@@ -113,6 +118,10 @@ export class SearchIndex {
 
   private static async createFromGlobAsync(pattern: string, options: SearchIndexOptions): Promise<ISearchIndexResult> {
     const files = await glob(pattern, {dotRelative: false, nodir: true});
+    if (files.length === 0 && !options.allowEmpty) {
+      throw new Error(`No files match "${pattern}" (relative to ${process.cwd()}). `
+        + "Set the allowEmpty option to create an empty index anyway.");
+    }
     const readFiles: HtmlFile[] = await Promise.all(files.map(async (file) => ({
       relative: file,
       contents: await fs.promises.readFile(file),

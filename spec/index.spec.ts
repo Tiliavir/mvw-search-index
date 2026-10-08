@@ -92,6 +92,15 @@ describe("SearchIndex", () => {
     }
   });
 
+  it("rejects when the pattern matches no files", async () => {
+    await expect(SearchIndex.createFromGlob("does-not-exist/**/*.html")).rejects.toThrow(/No files match/);
+  });
+
+  it("creates an empty index for no matches when allowEmpty is set", async () => {
+    const result = await SearchIndex.createFromGlob("does-not-exist/**/*.html", {allowEmpty: true});
+    expect(result.store).toEqual({});
+  });
+
   it("throws a helpful error when called with a 2.x style callback", () => {
     const legacy = SearchIndex.createFromGlob as unknown as (p: string, s: string, cb: () => void) => unknown;
     expect(() => legacy("docs/**/*.html", "body", () => undefined)).toThrow(/no longer accepts a callback/);
