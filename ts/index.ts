@@ -50,6 +50,17 @@ const silentLogger: Logger = {
   warn: () => undefined,
 };
 
+/** The indexed fields. */
+export type SearchField = "title" | "keywords" | "description" | "body";
+
+/** Default for the `boosts` option. */
+export const DEFAULT_BOOSTS: Readonly<Record<SearchField, number>> = Object.freeze({
+  title: 5,
+  keywords: 3,
+  description: 2,
+  body: 1,
+});
+
 export declare interface SearchIndexOptions {
   /** CSS selector of the element(s) whose text is indexed as body. Default: `"body"`. */
   bodySelector?: string;
@@ -70,6 +81,12 @@ export declare interface SearchIndexOptions {
    * client must then load as well before calling `lunr.Index.load()`. Default: `"en"`.
    */
   language?: string;
+  /**
+   * Relative weight of a match per field, so that a match in the title ranks above a
+   * match somewhere in the body text. Missing fields use the defaults. Default:
+   * `{title: 5, keywords: 3, description: 2, body: 1}`.
+   */
+  boosts?: Partial<Record<SearchField, number>>;
   /**
    * `createFromGlob` only: resolve with an empty index instead of rejecting when the
    * pattern matches no files. Default: `false`.
@@ -100,10 +117,10 @@ export class SearchIndex {
     if (plugin) {
       builder.use(plugin); // replaces both pipelines with the language specific ones
     }
-    builder.field("title");
-    builder.field("keywords");
-    builder.field("description");
-    builder.field("body");
+    const boosts = {...DEFAULT_BOOSTS, ...options.boosts};
+    for (const field of Object.keys(DEFAULT_BOOSTS) as SearchField[]) {
+      builder.field(field, {boost: boosts[field]});
+    }
     builder.ref("href");
 
     files.forEach((info: IFileInformation): void => {
@@ -119,7 +136,7 @@ export class SearchIndex {
 
   /**
    * @param files Already extracted page information to index.
-   * @param options Only `language` applies here; the other options concern HTML parsing.
+   * @param options Only `language` and `boosts` apply here; the other options concern HTML parsing.
    */
   public static createFromInfo(files: IFileInformation[], options?: SearchIndexOptions): ISearchIndexResult {
     return new SearchIndex(files, normalizeOptions(options)).getResult();

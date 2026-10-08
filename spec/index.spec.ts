@@ -292,3 +292,21 @@ describe("language", () => {
     expect(() => SearchIndex.createFromInfo([], {language: "../x"})).toThrow(/Invalid language/);
   });
 });
+
+describe("ranking", () => {
+  const files: IFileInformation[] = [
+    {href: "body.html", title: "Probenplan", body: "Am Samstag findet das Jahreskonzert statt."},
+    {href: "title.html", title: "Jahreskonzert 2026 im grossen Saal der Mehrzweckhalle", body: "Programm und Tickets."},
+  ];
+  const ranking = (options?: SearchIndexOptions) =>
+    lunr.Index.load(JSON.parse(JSON.stringify(SearchIndex.createFromInfo(files, options).index)))
+      .search("Jahreskonzert").map((r) => r.ref);
+
+  it("ranks title matches above body matches by default", () => {
+    expect(ranking()).toEqual(["title.html", "body.html"]);
+  });
+
+  it("allows overriding the field boosts", () => {
+    expect(ranking({boosts: {title: 1, body: 10}})).toEqual(["body.html", "title.html"]);
+  });
+});
