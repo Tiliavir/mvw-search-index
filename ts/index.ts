@@ -2,6 +2,7 @@ import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
 import * as lunr from "lunr";
+import {extractText} from "./html";
 
 
 export declare interface IResultStore {
@@ -99,7 +100,7 @@ export class SearchIndex {
       logger.info(`Indexing ${file.relative}`);
       const dom = cheerio.load(file.contents.toString());
       return {
-        body: dom(bodySelector || "body").text().replace(/\s\s+/g, " "),
+        body: extractText(dom, bodySelector || "body"),
         href: file.relative,
         description: dom("meta[name='description']").attr("content"),
         keywords: dom("meta[name='keywords']").attr("content"),
