@@ -3,7 +3,7 @@
         "module": "commonjs",
         "outDir": "../js",
         "declaration": true,
-        "sourceMap": true,
+        "sourceMap": false,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "removeComments": false,

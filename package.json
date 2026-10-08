@@ -22,6 +22,13 @@
   },
   "main": "js/index.js",
   "types": "js/index.d.ts",
+  "files": [
+    "js/**/*.js",
+    "js/**/*.d.ts"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "devDependencies": {
     "@types/cheerio": "1.0.0",
     "@types/lunr": "2.3.7",
