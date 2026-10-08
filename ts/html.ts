@@ -12,6 +12,9 @@ const BLOCK_ELEMENTS: string = [
   "tbody", "td", "tfoot", "th", "thead", "tr", "ul",
 ].join(",");
 
+/** Elements whose content is never visible page text. */
+const NON_CONTENT_ELEMENTS = "script, style, noscript, template";
+
 /** Collapses all whitespace runs (including single newlines and tabs) into one space. */
 export function normalizeWhitespace(text: string): string {
   return text.replace(/\s+/g, " ").trim();
@@ -24,6 +27,7 @@ export function normalizeWhitespace(text: string): string {
  * Note: modifies the document.
  */
 export function extractText($: CheerioAPI, selector: string): string {
+  $(NON_CONTENT_ELEMENTS).remove();
   $("br").replaceWith(" ");
   $(BLOCK_ELEMENTS).prepend(" ").append(" ");
 

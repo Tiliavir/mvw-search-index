@@ -162,4 +162,16 @@ describe("text extraction", () => {
     expect(hits(index, "two")).toBe(1);
     expect(hits(index, "skip")).toBe(0);
   });
+
+  it("never indexes scripts, styles, noscript and template content", () => {
+    const index = indexHtml(`<body><p>visible</p>
+      <script>var secretFunctionName = 1;</script>
+      <style>.fancyClass { color: red }</style>
+      <noscript>enablejavascript</noscript>
+      <template><p>templatetext</p></template></body>`);
+    expect(hits(index, "visible")).toBe(1);
+    for (const word of ["secretFunctionName", "fancyClass", "enablejavascript", "templatetext"]) {
+      expect(hits(index, word), word).toBe(0);
+    }
+  });
 });
