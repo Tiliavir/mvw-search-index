@@ -45,7 +45,6 @@
 
 <div>
   <form>
-    <meta content="search.html?q={query}">
     <input class="mvw-search-field" name="query" placeholder="Search..." type="search">
   </form>
 
@@ -54,69 +53,77 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
 <script>
-  let MVW;
-  (function (MVW) {
-    (function (Search) {
-      let index;
-      let store;
+  (function () {
+    let index;
+    let store;
 
-      function handleSearch() {
-        const query = document.querySelector("input.mvw-search-field")?.value;
-        const result = index.search("*" + query + "*"); // lunr by default does full-term matching - hence the *s
-        const resultContainer = document.querySelector(".results");
-        if (result.length === 0) {
-          resultContainer.innerHTML = "No matches found...";
-        } else {
-          resultContainer.innerHTML = "";
-          for (const item in result) {
-            if (result.hasOwnProperty(item)) {
-              const ref = result[item].ref;
-              const html = "<li><a href=\"" + ref + "\">" + store[ref].title + "</a><span>" + store[ref].description + "</span></li>";
-              resultContainer.insertAdjacentHTML("beforeend", html);
-            }
+    // Builds the query with lunr's query API instead of the query string syntax:
+    // user input such as "title:" or "a~" can't cause a QueryParseError, and every
+    // word is matched both exactly (through the index's pipeline, i.e. stemmed) and
+    // as prefix, so results show up while typing.
+    function search(input) {
+      const terms = lunr.tokenizer(input)
+        .map((token) => lunr.trimmer(token).toString())
+        .filter((term) => term.length > 0);
+      if (terms.length === 0) {
+        return [];
+      }
+      return index.query((query) => {
+        for (const term of terms) {
+          query.term(term, {boost: 10});
+          query.term(term, {usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING});
+        }
+      });
+    }
+
+    function renderResults(results, input) {
+      const container = document.querySelector(".results");
+      container.replaceChildren();
+      if (input.trim() === "") {
+        return;
+      }
+      if (results.length === 0) {
+        container.textContent = "No matches found...";
+        return;
+      }
+      for (const result of results) {
+        const entry = store[result.ref];
+        const link = document.createElement("a");
+        link.href = result.ref;
+        link.textContent = entry.title;
+        const description = document.createElement("span");
+        description.textContent = entry.description || "";
+        const item = document.createElement("li");
+        item.append(link, description);
+        container.append(item);
+      }
+    }
+
+    function handleSearch() {
+      const input = document.querySelector("input.mvw-search-field").value;
+      renderResults(search(input), input);
+    }
+
+    function initialize() {
+      fetch("index.json")
+        .then((response) => response.json())
+        .then((data) => {
+          index = lunr.Index.load(data.index);
+          store = data.store;
+          const params = new URLSearchParams(globalThis.location.search);
+          const query = params.get("query") || params.get("q");
+          const inputField = document.querySelector("input.mvw-search-field");
+          if (query) {
+            inputField.value = query;
           }
-          resultContainer.style.display = "block";
-        }
-      }
+          inputField.addEventListener("input", handleSearch);
+          handleSearch();
+        })
+        .catch((err) => console.error("Failed to load index.json", err));
+    }
 
-      function getParameterByName(name) {
-        const url = globalThis.location.href;
-        name = name.replace(/[\[\]]/g, "\\$&");
-        const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-        const results = regex.exec(url);
-        if (!results) {
-          return null;
-        }
-        if (!results[2]) {
-          return "";
-        }
-        return decodeURIComponent(results[2].replace(/\+/g, " "));
-      }
-
-      function initialize() {
-        fetch("index.json")
-          .then((response) => response.json())
-          .then((data) => {
-            index = lunr.Index.load(data.index);
-            store = data.store;
-            const query = getParameterByName("query") || getParameterByName("q");
-            const inputField = document.querySelector("input.mvw-search-field");
-            if (query) {
-              inputField.value = query;
-            }
-            inputField.addEventListener("keyup", handleSearch);
-            handleSearch();
-          })
-          .catch((err) => console.error("Failed to load index.json", err));
-      }
-
-      Search.initialize = initialize;
-    })(MVW.Search || (MVW.Search = {}));
-  })(MVW || (MVW = {}));
-
-  document.addEventListener("DOMContentLoaded", function () {
-    MVW.Search.initialize();
-  });
+    document.addEventListener("DOMContentLoaded", initialize);
+  })();
 </script>
 <br/>
 <br/>
