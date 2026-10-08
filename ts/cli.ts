@@ -2,11 +2,15 @@
 
 import { program } from "commander";
 import * as fs from "fs";
+import * as path from "path";
 
 import { SearchIndex } from "./index";
 
+// read at runtime: package.json is outside of the compiled sources
+const {version} = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
+
 program
-  .version("2.2.8")
+  .version(version)
   .arguments("<glob> <dest> [bodySelector]")
   .action(async (glob, dest, bodySelector) => {
     try {
