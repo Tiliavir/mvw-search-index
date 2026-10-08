@@ -174,4 +174,28 @@ describe("text extraction", () => {
       expect(hits(index, word), word).toBe(0);
     }
   });
+
+  it("excludes nav and footer by default", () => {
+    const html = "<body><nav>Impressum</nav><main>Jahreskonzert</main><footer>Datenschutz</footer></body>";
+    const index = indexHtml(html);
+    expect(hits(index, "Jahreskonzert")).toBe(1);
+    expect(hits(index, "Impressum")).toBe(0);
+    expect(hits(index, "Datenschutz")).toBe(0);
+  });
+
+  it("supports a custom exclude selector, or none", () => {
+    const html = "<body><nav>Impressum</nav><main>Jahreskonzert <span class='ad'>Werbung</span></main></body>";
+    const custom = indexHtml(html, {excludeSelector: ".ad"});
+    expect(hits(custom, "Werbung")).toBe(0);
+    expect(hits(custom, "Impressum")).toBe(1);
+
+    const none = indexHtml(html, {excludeSelector: ""});
+    expect(hits(none, "Werbung")).toBe(1);
+    expect(hits(none, "Impressum")).toBe(1);
+  });
+
+  it("still indexes a body selector that matches the exclude selector itself", () => {
+    const index = indexHtml("<body><footer>Kontakt</footer></body>", {bodySelector: "footer"});
+    expect(hits(index, "Kontakt")).toBe(1);
+  });
 });

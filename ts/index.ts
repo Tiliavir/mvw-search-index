@@ -2,7 +2,9 @@ import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
 import * as lunr from "lunr";
-import {extractText} from "./html";
+import {DEFAULT_EXCLUDE_SELECTOR, extractText} from "./html";
+
+export {DEFAULT_EXCLUDE_SELECTOR};
 
 
 export declare interface IResultStore {
@@ -51,6 +53,11 @@ export declare interface SearchIndexOptions {
   /** CSS selector of the element(s) whose text is indexed as body. Default: `"body"`. */
   bodySelector?: string;
   /**
+   * CSS selector of elements inside the body to leave out, e.g. navigation and footers
+   * that repeat on every page. Use `""` to exclude nothing. Default: `"nav, footer"`.
+   */
+  excludeSelector?: string;
+  /**
    * `createFromGlob` only: resolve with an empty index instead of rejecting when the
    * pattern matches no files. Default: `false`.
    */
@@ -95,12 +102,12 @@ export class SearchIndex {
    * @param options Options, or - for backwards compatibility - just the body selector.
    */
   public static createFromHtml(files: HtmlFile[], options?: string | SearchIndexOptions): ISearchIndexResult {
-    const {bodySelector, logger = silentLogger} = normalizeOptions(options);
+    const {bodySelector, excludeSelector, logger = silentLogger} = normalizeOptions(options);
     const infos: IFileInformation[] = files.map((file) => {
       logger.info(`Indexing ${file.relative}`);
       const dom = cheerio.load(file.contents.toString());
       return {
-        body: extractText(dom, bodySelector || "body"),
+        body: extractText(dom, bodySelector || "body", excludeSelector),
         href: file.relative,
         description: dom("meta[name='description']").attr("content"),
         keywords: dom("meta[name='keywords']").attr("content"),

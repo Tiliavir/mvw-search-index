@@ -20,13 +20,17 @@ export function normalizeWhitespace(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
+/** Default for the `excludeSelector` option: site-wide navigation and footers. */
+export const DEFAULT_EXCLUDE_SELECTOR = "nav, footer";
+
 /**
  * Returns the visible text of all elements matching `selector`, with block-level
- * elements and separate matches delimited by spaces.
+ * elements and separate matches delimited by spaces. Descendants matching
+ * `excludeSelector` are left out.
  *
  * Note: modifies the document.
  */
-export function extractText($: CheerioAPI, selector: string): string {
+export function extractText($: CheerioAPI, selector: string, excludeSelector: string = DEFAULT_EXCLUDE_SELECTOR): string {
   $(NON_CONTENT_ELEMENTS).remove();
   $("br").replaceWith(" ");
   $(BLOCK_ELEMENTS).prepend(" ").append(" ");
@@ -34,5 +38,9 @@ export function extractText($: CheerioAPI, selector: string): string {
   // If matches are nested (e.g. selector "div"), only take the outermost ones -
   // otherwise the inner text would be indexed twice.
   const roots = $(selector).filter((_, el) => $(el).parents(selector).length === 0);
+  if (excludeSelector.trim()) {
+    // only descendants: a body selector that itself matches the exclusion still works
+    roots.find(excludeSelector).remove();
+  }
   return normalizeWhitespace(roots.map((_, el) => $(el).text()).get().join(" "));
 }
