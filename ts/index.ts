@@ -92,21 +92,32 @@ export class SearchIndex {
     return SearchIndex.createFromInfo(infos);
   }
 
+  /**
+   * Indexes all HTML files matching a glob pattern.
+   *
+   * @param pattern Glob pattern of the HTML files to index.
+   * @param options Options, or - for backwards compatibility - just the body selector.
+   * @returns The index and result store. Rejects if a file cannot be read.
+   */
   public static createFromGlob(pattern: string,
-                               options: string | SearchIndexOptions | undefined,
-                               cb: (index: ISearchIndexResult) => void): void {
-    glob(pattern, {
-      dotRelative: false
-    }).then(files => {
-        const readFiles: HtmlFile[] = files.map((file) => ({
-          relative: file,
-          contents: fs.readFileSync(file)
-        }));
-        cb(SearchIndex.createFromHtml(readFiles, options));
-      }
-    ).catch(err => {
-      throw err;
-    });
+                               options?: string | SearchIndexOptions,
+                               ...legacyCallback: never[]): Promise<ISearchIndexResult> {
+    if (legacyCallback.length > 0) {
+      // 2.x took a callback as third argument. Silently ignoring it would mean the
+      // caller's index is simply never written - fail loudly instead.
+      throw new TypeError("SearchIndex.createFromGlob() no longer accepts a callback; it returns a Promise. "
+        + "See https://github.com/Tiliavir/mvw-search-index/blob/main/UPGRADING.md");
+    }
+    return SearchIndex.createFromGlobAsync(pattern, normalizeOptions(options));
+  }
+
+  private static async createFromGlobAsync(pattern: string, options: SearchIndexOptions): Promise<ISearchIndexResult> {
+    const files = await glob(pattern, {dotRelative: false, nodir: true});
+    const readFiles: HtmlFile[] = await Promise.all(files.map(async (file) => ({
+      relative: file,
+      contents: await fs.promises.readFile(file),
+    })));
+    return SearchIndex.createFromHtml(readFiles, options);
   }
 
   private getResult(): ISearchIndexResult {

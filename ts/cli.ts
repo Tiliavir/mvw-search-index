@@ -8,9 +8,13 @@ import { SearchIndex } from "./index";
 program
   .version("2.2.8")
   .arguments("<glob> <dest> [bodySelector]")
-  .action((glob, dest, bodySelector) => {
-    SearchIndex.createFromGlob(glob, bodySelector, (index) =>
-      fs.writeFileSync(dest, JSON.stringify(index)),
-    );
+  .action(async (glob, dest, bodySelector) => {
+    try {
+      const index = await SearchIndex.createFromGlob(glob, bodySelector);
+      await fs.promises.writeFile(dest, JSON.stringify(index));
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : err);
+      process.exitCode = 1;
+    }
   })
-  .parse(process.argv);
+  .parseAsync(process.argv);

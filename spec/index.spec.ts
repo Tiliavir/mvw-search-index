@@ -1,4 +1,5 @@
-import {describe, it, expect} from "vitest";
+import {describe, it, expect, vi} from "vitest";
+import * as fs from "fs";
 import {IFileInformation, ISearchIndexResult, SearchIndex} from "../ts";
 import * as lunr from "lunr";
 
@@ -52,40 +53,48 @@ describe("SearchIndex", () => {
     expect(result.store[r[0].ref].title).toBe("Hello");
   });
 
-  it("tests that files are read and represented in the resulting index", () => {
-    return new Promise<void>((resolve) => {
-      SearchIndex.createFromGlob("docs/**/*.html",
-        "body.to-be-indexed",
-        (result: ISearchIndexResult) => {
-          expect(result.store).toEqual({
-              'docs/foo.html': {
-                description: 'This is the description of foo.html that will be indexed and used as a summary ;-)',
-                title: 'Foo Title'
-              },
-              'docs/index.html': {
-                description: 'This is the description of the index.html landing page that will be indexed and used as a summary ;-)',
-                title: 'Search Page'
-              },
-              'docs/sub/index.html': {
-                description: 'This is the description of sub/index.html that will be indexed and used as a summary ;-)',
-                title: 'Sub Page Title'
-              }
-            }
-          );
-          expect(result.index).toBeDefined();
+  it("tests that files are read and represented in the resulting index", async () => {
+    const result: ISearchIndexResult = await SearchIndex.createFromGlob("docs/**/*.html", "body.to-be-indexed");
+    expect(result.store).toEqual({
+        'docs/foo.html': {
+          description: 'This is the description of foo.html that will be indexed and used as a summary ;-)',
+          title: 'Foo Title'
+        },
+        'docs/index.html': {
+          description: 'This is the description of the index.html landing page that will be indexed and used as a summary ;-)',
+          title: 'Search Page'
+        },
+        'docs/sub/index.html': {
+          description: 'This is the description of sub/index.html that will be indexed and used as a summary ;-)',
+          title: 'Sub Page Title'
+        }
+      }
+    );
+    expect(result.index).toBeDefined();
 
-          const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
+    const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
 
-          let r: lunr.Index.Result[] = lnr.search("IAmUnique");
-          expect(r.length).toBe(1);
-          expect(r[0].ref).toBe("docs/foo.html");
-          expect(result.store[r[0].ref].title).toBe("Foo Title");
+    let r: lunr.Index.Result[] = lnr.search("IAmUnique");
+    expect(r.length).toBe(1);
+    expect(r[0].ref).toBe("docs/foo.html");
+    expect(result.store[r[0].ref].title).toBe("Foo Title");
 
-          r = lnr.search("NotToBeFound");
-          expect(r.length).toBe(0);
-          resolve();
-        });
-    });
+    r = lnr.search("NotToBeFound");
+    expect(r.length).toBe(0);
+  });
+
+  it("rejects when a matched file cannot be read", async () => {
+    const spy = vi.spyOn(fs.promises, "readFile").mockRejectedValueOnce(new Error("EACCES: permission denied"));
+    try {
+      await expect(SearchIndex.createFromGlob("docs/**/*.html")).rejects.toThrow("EACCES");
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("throws a helpful error when called with a 2.x style callback", () => {
+    const legacy = SearchIndex.createFromGlob as unknown as (p: string, s: string, cb: () => void) => unknown;
+    expect(() => legacy("docs/**/*.html", "body", () => undefined)).toThrow(/no longer accepts a callback/);
   });
 
   it("accepts an options object and string contents", () => {
