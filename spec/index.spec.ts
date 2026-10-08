@@ -237,3 +237,76 @@ describe("metadata", () => {
     expect(warnings).toHaveLength(1);
   });
 });
+
+describe("text processing", () => {
+  const index = () => indexHtml(`<head><title>Concerts</title><meta name="keywords" content="Blasmusik, Konzert"></head>
+    <body><p>The band is running rehearsals. Call Markus: info@example.org!</p></body>`);
+
+  it("stems words, so different forms of a word match", () => {
+    expect(hits(index(), "concert")).toBe(1);
+    expect(hits(index(), "run")).toBe(1);
+    expect(hits(index(), "rehearsal")).toBe(1);
+  });
+
+  it("strips punctuation from the start and end of words", () => {
+    expect(hits(index(), "Blasmusik")).toBe(1);
+    expect(hits(index(), "Markus")).toBe(1);
+  });
+
+  it("splits keywords on commas even without spaces", () => {
+    const index = indexHtml(`<head><meta name="keywords" content="Blasmusik,Konzert;Musikverein"></head>`);
+    for (const word of ["Blasmusik", "Konzert", "Musikverein"]) {
+      expect(hits(index, word), word).toBe(1);
+    }
+  });
+
+  it("does not index stop words", () => {
+    expect(hits(index(), "the")).toBe(0);
+  });
+
+  it("serializes the stemmer as search pipeline for use by the client", () => {
+    const result = SearchIndex.createFromInfo([{href: "a", title: "a", body: "b"}]);
+    expect(JSON.parse(JSON.stringify(result.index)).pipeline).toEqual(["stemmer"]);
+  });
+});
+
+describe("language", () => {
+  const html = `<head><title>Die Konzerte</title></head>
+    <body><p>Unser Menü für alle Musikvereine. Herzliche Grüße!</p></body>`;
+
+  it("uses German stop words and stemming for language 'de'", () => {
+    const result = SearchIndex.createFromHtml([{relative: "p.html", contents: html}], {language: "de"});
+    const serialized = JSON.parse(JSON.stringify(result.index));
+    expect(serialized.pipeline).toEqual(["trimmer-de", "stemmer-de"]);
+
+    const index = lunr.Index.load(serialized);
+    expect(hits(index, "Konzert")).toBe(1);
+    expect(hits(index, "Musikverein")).toBe(1);
+    expect(hits(index, "Menü")).toBe(1);
+    expect(hits(index, "Grüsse")).toBe(1);
+    expect(hits(index, "für")).toBe(0);
+  });
+
+  it("rejects unknown or malformed languages with a helpful message", () => {
+    expect(() => SearchIndex.createFromInfo([], {language: "xx"})).toThrow(/Unsupported language "xx"/);
+    expect(() => SearchIndex.createFromInfo([], {language: "../x"})).toThrow(/Invalid language/);
+  });
+});
+
+describe("ranking", () => {
+  const files: IFileInformation[] = [
+    {href: "body.html", title: "Probenplan", body: "Am Samstag findet das Jahreskonzert statt."},
+    {href: "title.html", title: "Jahreskonzert 2026 im grossen Saal der Mehrzweckhalle", body: "Programm und Tickets."},
+  ];
+  const ranking = (options?: SearchIndexOptions) =>
+    lunr.Index.load(JSON.parse(JSON.stringify(SearchIndex.createFromInfo(files, options).index)))
+      .search("Jahreskonzert").map((r) => r.ref);
+
+  it("ranks title matches above body matches by default", () => {
+    expect(ranking()).toEqual(["title.html", "body.html"]);
+  });
+
+  it("allows overriding the field boosts", () => {
+    expect(ranking({boosts: {title: 1, body: 10}})).toEqual(["body.html", "title.html"]);
+  });
+});
