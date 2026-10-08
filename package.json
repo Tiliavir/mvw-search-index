@@ -31,7 +31,6 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@types/cheerio": "1.0.0",
     "@types/lunr": "2.3.7",
     "@types/node": "26.6.4",
     "eslint": "10.12.0",

@@ -1,7 +1,0 @@
-{
-  "extends": "tslint:recommended",
-  "rules": {
-    "no-var-requires": false,
-    "no-console": false
-  }
-}
