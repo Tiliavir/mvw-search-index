@@ -1,18 +1,18 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "outDir": "../js",
-        "declaration": true,
-        "sourceMap": false,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "removeComments": false,
-        "noImplicitAny": true,
-        "noImplicitThis": true,
-        "allowUnreachableCode": false,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "skipLibCheck": true,
-        "preserveConstEnums": true
-    }
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2022"],
+    "module": "commonjs",
+    "types": ["node"],
+    "rootDir": ".",
+    "outDir": "../js",
+    "declaration": true,
+    "sourceMap": false,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnreachableCode": false,
+    "skipLibCheck": true
+  },
+  "include": ["*.ts"]
 }
