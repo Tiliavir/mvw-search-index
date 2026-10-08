@@ -269,3 +269,26 @@ describe("text processing", () => {
     expect(JSON.parse(JSON.stringify(result.index)).pipeline).toEqual(["stemmer"]);
   });
 });
+
+describe("language", () => {
+  const html = `<head><title>Die Konzerte</title></head>
+    <body><p>Unser Menü für alle Musikvereine. Herzliche Grüße!</p></body>`;
+
+  it("uses German stop words and stemming for language 'de'", () => {
+    const result = SearchIndex.createFromHtml([{relative: "p.html", contents: html}], {language: "de"});
+    const serialized = JSON.parse(JSON.stringify(result.index));
+    expect(serialized.pipeline).toEqual(["trimmer-de", "stemmer-de"]);
+
+    const index = lunr.Index.load(serialized);
+    expect(hits(index, "Konzert")).toBe(1);
+    expect(hits(index, "Musikverein")).toBe(1);
+    expect(hits(index, "Menü")).toBe(1);
+    expect(hits(index, "Grüsse")).toBe(1);
+    expect(hits(index, "für")).toBe(0);
+  });
+
+  it("rejects unknown or malformed languages with a helpful message", () => {
+    expect(() => SearchIndex.createFromInfo([], {language: "xx"})).toThrow(/Unsupported language "xx"/);
+    expect(() => SearchIndex.createFromInfo([], {language: "../x"})).toThrow(/Invalid language/);
+  });
+});

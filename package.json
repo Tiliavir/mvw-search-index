@@ -43,7 +43,8 @@
     "cheerio": "1.2.0",
     "commander": "15.0.0",
     "glob": "13.0.6",
-    "lunr": "2.3.9"
+    "lunr": "2.3.9",
+    "lunr-languages": "1.22.0"
   },
   "scripts": {
     "prepare": "npm run build",

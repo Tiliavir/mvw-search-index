@@ -3,8 +3,9 @@ import {glob} from "glob";
 import * as fs from "fs";
 import * as lunr from "lunr";
 import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
+import {DEFAULT_LANGUAGE, languagePlugin} from "./language";
 
-export {DEFAULT_EXCLUDE_SELECTOR};
+export {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE};
 
 
 export declare interface IResultStore {
@@ -63,6 +64,13 @@ export declare interface SearchIndexOptions {
    */
   respectNoindex?: boolean;
   /**
+   * Language of the content, as two-letter code. Selects stop words and stemmer.
+   * Anything other than `"en"` uses the matching plugin of
+   * [lunr-languages](https://github.com/MihaiValentin/lunr-languages), which the
+   * client must then load as well before calling `lunr.Index.load()`. Default: `"en"`.
+   */
+  language?: string;
+  /**
    * `createFromGlob` only: resolve with an empty index instead of rejecting when the
    * pattern matches no files. Default: `false`.
    */
@@ -79,7 +87,7 @@ export class SearchIndex {
   private readonly store: IResultStore;
   private readonly index: lunr.Index;
 
-  private constructor(files: IFileInformation[]) {
+  private constructor(files: IFileInformation[], options: SearchIndexOptions) {
     this.store = {};
     const builder: lunr.Builder = new lunr.Builder();
     // The same text processing lunr() sets up by default. A bare Builder has empty
@@ -88,6 +96,10 @@ export class SearchIndex {
     // into the index, so lunr applies the stemmer to queries on the client as well.
     builder.pipeline.add(lunr.trimmer, lunr.stopWordFilter, lunr.stemmer);
     builder.searchPipeline.add(lunr.stemmer);
+    const plugin = languagePlugin(options.language ?? DEFAULT_LANGUAGE);
+    if (plugin) {
+      builder.use(plugin); // replaces both pipelines with the language specific ones
+    }
     builder.field("title");
     builder.field("keywords");
     builder.field("description");
@@ -105,8 +117,12 @@ export class SearchIndex {
     this.index = builder.build();
   }
 
-  public static createFromInfo(files: IFileInformation[]): ISearchIndexResult {
-    return new SearchIndex(files).getResult();
+  /**
+   * @param files Already extracted page information to index.
+   * @param options Only `language` applies here; the other options concern HTML parsing.
+   */
+  public static createFromInfo(files: IFileInformation[], options?: SearchIndexOptions): ISearchIndexResult {
+    return new SearchIndex(files, normalizeOptions(options)).getResult();
   }
 
   /**
@@ -114,7 +130,8 @@ export class SearchIndex {
    * @param options Options, or - for backwards compatibility - just the body selector.
    */
   public static createFromHtml(files: HtmlFile[], options?: string | SearchIndexOptions): ISearchIndexResult {
-    const {bodySelector, excludeSelector, respectNoindex = true, logger = silentLogger} = normalizeOptions(options);
+    const normalized = normalizeOptions(options);
+    const {bodySelector, excludeSelector, respectNoindex = true, logger = silentLogger} = normalized;
     const infos: IFileInformation[] = [];
     for (const file of files) {
       const dom = cheerio.load(file.contents.toString());
@@ -134,7 +151,7 @@ export class SearchIndex {
       });
     }
 
-    return SearchIndex.createFromInfo(infos);
+    return SearchIndex.createFromInfo(infos, normalized);
   }
 
   /**
