@@ -87,4 +87,15 @@ describe("SearchIndex", () => {
         });
     });
   });
+
+  it("accepts an options object and string contents", () => {
+    const result: ISearchIndexResult = SearchIndex.createFromHtml([{
+      relative: "a.html",
+      contents: "<html><head><title>A</title></head><body><main>inside</main><p>outside</p></body></html>",
+    }], {bodySelector: "main"});
+
+    const lnr = lunr.Index.load(JSON.parse(JSON.stringify(result.index)));
+    expect(lnr.search("inside").length).toBe(1);
+    expect(lnr.search("outside").length).toBe(0);
+  });
 });

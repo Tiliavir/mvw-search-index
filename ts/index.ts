@@ -7,15 +7,15 @@ import * as lunr from "lunr";
 export declare interface IResultStore {
   [key: string]: {
     title: string;
-    description: string | undefined;
+    description?: string;
   };
 }
 
 export declare interface IFileInformation {
   body: string;
-  description: string | undefined;
+  description?: string;
   href: string;
-  keywords: string | undefined;
+  keywords?: string;
   title: string;
 }
 
@@ -24,9 +24,24 @@ export declare interface ISearchIndexResult {
   store: IResultStore;
 }
 
-declare interface ReadFileWithContents {
-  contents: Buffer;
+/** An HTML document to index. */
+export declare interface HtmlFile {
+  /** The raw HTML. */
+  contents: Buffer | string;
+  /** Path of the file; used as the `href` of the search result. */
   relative: string;
+}
+
+/** @deprecated Use {@link HtmlFile}. */
+export type ReadFileWithContents = HtmlFile;
+
+export declare interface SearchIndexOptions {
+  /** CSS selector of the element(s) whose text is indexed as body. Default: `"body"`. */
+  bodySelector?: string;
+}
+
+function normalizeOptions(options: string | SearchIndexOptions | undefined): SearchIndexOptions {
+  return typeof options === "string" ? {bodySelector: options} : {...options};
 }
 
 export class SearchIndex {
@@ -56,7 +71,12 @@ export class SearchIndex {
     return new SearchIndex(files).getResult();
   }
 
-  public static createFromHtml(files: ReadFileWithContents[], bodySelector: string = "body"): ISearchIndexResult {
+  /**
+   * @param files HTML documents to index.
+   * @param options Options, or - for backwards compatibility - just the body selector.
+   */
+  public static createFromHtml(files: HtmlFile[], options?: string | SearchIndexOptions): ISearchIndexResult {
+    const {bodySelector} = normalizeOptions(options);
     const infos: IFileInformation[] = files.map((file) => {
       console.info(file.relative);
       const dom = cheerio.load(file.contents.toString());
@@ -73,16 +93,16 @@ export class SearchIndex {
   }
 
   public static createFromGlob(pattern: string,
-                               bodySelector: string,
+                               options: string | SearchIndexOptions | undefined,
                                cb: (index: ISearchIndexResult) => void): void {
     glob(pattern, {
       dotRelative: false
     }).then(files => {
-        const readFiles: ReadFileWithContents[] = files.map((file) => ({
+        const readFiles: HtmlFile[] = files.map((file) => ({
           relative: file,
           contents: fs.readFileSync(file)
         }));
-        cb(SearchIndex.createFromHtml(readFiles, bodySelector));
+        cb(SearchIndex.createFromHtml(readFiles, options));
       }
     ).catch(err => {
       throw err;
