@@ -237,3 +237,28 @@ describe("metadata", () => {
     expect(warnings).toHaveLength(1);
   });
 });
+
+describe("text processing", () => {
+  const index = () => indexHtml(`<head><title>Concerts</title><meta name="keywords" content="Blasmusik, Konzert"></head>
+    <body><p>The band is running rehearsals. Call Markus: info@example.org!</p></body>`);
+
+  it("stems words, so different forms of a word match", () => {
+    expect(hits(index(), "concert")).toBe(1);
+    expect(hits(index(), "run")).toBe(1);
+    expect(hits(index(), "rehearsal")).toBe(1);
+  });
+
+  it("strips punctuation from the start and end of words", () => {
+    expect(hits(index(), "Blasmusik")).toBe(1);
+    expect(hits(index(), "Markus")).toBe(1);
+  });
+
+  it("does not index stop words", () => {
+    expect(hits(index(), "the")).toBe(0);
+  });
+
+  it("serializes the stemmer as search pipeline for use by the client", () => {
+    const result = SearchIndex.createFromInfo([{href: "a", title: "a", body: "b"}]);
+    expect(JSON.parse(JSON.stringify(result.index)).pipeline).toEqual(["stemmer"]);
+  });
+});

@@ -82,6 +82,12 @@ export class SearchIndex {
   private constructor(files: IFileInformation[]) {
     this.store = {};
     const builder: lunr.Builder = new lunr.Builder();
+    // The same text processing lunr() sets up by default. A bare Builder has empty
+    // pipelines, which meant no stemming, no stop word removal and punctuation
+    // sticking to words ("konzert," / "page:"). The search pipeline is serialized
+    // into the index, so lunr applies the stemmer to queries on the client as well.
+    builder.pipeline.add(lunr.trimmer, lunr.stopWordFilter, lunr.stemmer);
+    builder.searchPipeline.add(lunr.stemmer);
     builder.field("title");
     builder.field("keywords");
     builder.field("description");
