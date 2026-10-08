@@ -130,7 +130,8 @@ export class SearchIndex {
   }
 
   private static async createFromGlobAsync(pattern: string, options: SearchIndexOptions): Promise<ISearchIndexResult> {
-    const files = await glob(pattern, {dotRelative: false, nodir: true});
+    // glob's result order depends on the file system - sort for reproducible output
+    const files = (await glob(pattern, {dotRelative: false, nodir: true})).sort();
     if (files.length === 0 && !options.allowEmpty) {
       throw new Error(`No files match "${pattern}" (relative to ${process.cwd()}). `
         + "Set the allowEmpty option to create an empty index anyway.");

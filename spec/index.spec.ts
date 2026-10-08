@@ -70,6 +70,7 @@ describe("SearchIndex", () => {
         }
       }
     );
+    expect(Object.keys(result.store)).toEqual(["docs/foo.html", "docs/index.html", "docs/sub/index.html"]);
     expect(result.index).toBeDefined();
 
     const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
