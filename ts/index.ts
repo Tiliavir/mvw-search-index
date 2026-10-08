@@ -1,4 +1,4 @@
-﻿import * as cheerio from "cheerio";
+import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
 import * as lunr from "lunr";
@@ -48,7 +48,7 @@ export class SearchIndex {
         title: info.title,
       };
       builder.add(info);
-    }, builder);
+    });
     this.index = builder.build();
   }
 
