@@ -318,4 +318,9 @@ describe("hrefs", () => {
   it("always uses forward slashes", () => {
     expect(hrefs(["sub\\dir\\page.html"])).toEqual(["sub/dir/page.html"]);
   });
+
+  it("are relative to the cwd option", async () => {
+    const result = await SearchIndex.createFromGlob("**/*.html", {cwd: "docs"});
+    expect(Object.keys(result.store)).toEqual(["foo.html", "index.html", "sub/index.html"]);
+  });
 });

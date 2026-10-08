@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
+import * as path from "path";
 import * as lunr from "lunr";
 import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
 import {toHref} from "./href";
@@ -93,6 +94,12 @@ export declare interface SearchIndexOptions {
    * pattern matches no files. Default: `false`.
    */
   allowEmpty?: boolean;
+  /**
+   * `createFromGlob` only: directory the pattern is resolved against. The paths of
+   * the matched files relative to it become the hrefs, so point it at the root of
+   * the built site. Default: `process.cwd()`.
+   */
+  cwd?: string;
   /** Where to report progress (one message per indexed file). Default: silent. */
   logger?: Logger;
 }
@@ -192,15 +199,16 @@ export class SearchIndex {
   }
 
   private static async createFromGlobAsync(pattern: string, options: SearchIndexOptions): Promise<ISearchIndexResult> {
+    const cwd = path.resolve(options.cwd ?? ".");
     // glob's result order depends on the file system - sort for reproducible output
-    const files = (await glob(pattern, {dotRelative: false, nodir: true, posix: true})).sort();
+    const files = (await glob(pattern, {cwd, dotRelative: false, nodir: true, posix: true})).sort();
     if (files.length === 0 && !options.allowEmpty) {
-      throw new Error(`No files match "${pattern}" (relative to ${process.cwd()}). `
+      throw new Error(`No files match "${pattern}" in ${cwd}. `
         + "Set the allowEmpty option to create an empty index anyway.");
     }
     const readFiles: HtmlFile[] = await Promise.all(files.map(async (file) => ({
       relative: file,
-      contents: await fs.promises.readFile(file),
+      contents: await fs.promises.readFile(path.join(cwd, file)),
     })));
     return SearchIndex.createFromHtml(readFiles, options);
   }
