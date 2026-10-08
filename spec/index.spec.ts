@@ -323,4 +323,17 @@ describe("hrefs", () => {
     const result = await SearchIndex.createFromGlob("**/*.html", {cwd: "docs"});
     expect(Object.keys(result.store)).toEqual(["foo.html", "index.html", "sub/index.html"]);
   });
+
+  it("can be prefixed with a base URL", () => {
+    expect(hrefs(["a.html", "sub/b.html"], {baseUrl: "/"})).toEqual(["/a.html", "/sub/b.html"]);
+    expect(hrefs(["a.html"], {baseUrl: "https://example.org/site"})).toEqual(["https://example.org/site/a.html"]);
+    expect(hrefs(["a.html"], {baseUrl: "https://example.org/site/"})).toEqual(["https://example.org/site/a.html"]);
+  });
+
+  it("can strip index.html", () => {
+    expect(hrefs(["index.html", "sub/index.html", "sub/other.html", "myindex.html"], {stripIndexHtml: true}))
+      .toEqual(["./", "sub/", "sub/other.html", "myindex.html"]);
+    expect(hrefs(["index.html", "sub/index.html"], {stripIndexHtml: true, baseUrl: "/"}))
+      .toEqual(["/", "/sub/"]);
+  });
 });

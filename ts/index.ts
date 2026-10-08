@@ -4,10 +4,11 @@ import * as fs from "fs";
 import * as path from "path";
 import * as lunr from "lunr";
 import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
-import {toHref} from "./href";
+import {HrefOptions, toHref} from "./href";
 import {DEFAULT_LANGUAGE, languagePlugin} from "./language";
 
 export {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE};
+export type {HrefOptions};
 
 
 export declare interface IResultStore {
@@ -63,7 +64,7 @@ export const DEFAULT_BOOSTS: Readonly<Record<SearchField, number>> = Object.free
   body: 1,
 });
 
-export declare interface SearchIndexOptions {
+export declare interface SearchIndexOptions extends HrefOptions {
   /** CSS selector of the element(s) whose text is indexed as body. Default: `"body"`. */
   bodySelector?: string;
   /**
@@ -172,7 +173,7 @@ export class SearchIndex {
       infos.push({
         ...metadata,
         body: extractText(dom, bodySelector || "body", excludeSelector),
-        href: toHref(file.relative),
+        href: toHref(file.relative, normalized),
       });
     }
 
