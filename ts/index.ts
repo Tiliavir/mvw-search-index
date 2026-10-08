@@ -133,6 +133,9 @@ export class SearchIndex {
     builder.ref("href");
 
     files.forEach((info: IFileInformation): void => {
+      if (Object.prototype.hasOwnProperty.call(this.store, info.href)) {
+        throw new Error(`Duplicate href "${info.href}": every document needs a unique href.`);
+      }
       this.store[info.href] = {
         description: info.description,
         title: info.title,

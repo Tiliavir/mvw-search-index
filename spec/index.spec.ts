@@ -336,4 +336,11 @@ describe("hrefs", () => {
     expect(hrefs(["index.html", "sub/index.html"], {stripIndexHtml: true, baseUrl: "/"}))
       .toEqual(["/", "/sub/"]);
   });
+
+  it("must be unique", () => {
+    expect(() => SearchIndex.createFromInfo([
+      {href: "x", title: "A", body: "alpha"},
+      {href: "x", title: "B", body: "beta"},
+    ])).toThrow(/Duplicate href "x"/);
+  });
 });
