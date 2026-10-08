@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import {glob} from "glob";
 import * as fs from "fs";
 import * as lunr from "lunr";
-import {DEFAULT_EXCLUDE_SELECTOR, extractText, isNoindex} from "./html";
+import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
 
 export {DEFAULT_EXCLUDE_SELECTOR};
 
@@ -116,12 +116,14 @@ export class SearchIndex {
         continue;
       }
       logger.info(`Indexing ${file.relative}`);
+      const metadata = extractMetadata(dom);
+      if (!metadata.title) {
+        logger.warn(`${file.relative} has no <title>, og:title or <h1> - its search result will have an empty title`);
+      }
       infos.push({
+        ...metadata,
         body: extractText(dom, bodySelector || "body", excludeSelector),
         href: file.relative,
-        description: dom("meta[name='description']").attr("content"),
-        keywords: dom("meta[name='keywords']").attr("content"),
-        title: dom("head title").text(),
       });
     }
 

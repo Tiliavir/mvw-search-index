@@ -20,6 +20,34 @@ export function normalizeWhitespace(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
+export declare interface PageMetadata {
+  title: string;
+  description?: string;
+  keywords?: string;
+}
+
+function nonEmpty(value: string | undefined): string | undefined {
+  const normalized = normalizeWhitespace(value ?? "");
+  return normalized === "" ? undefined : normalized;
+}
+
+/**
+ * Reads title, description and keywords, falling back to Open Graph tags and the
+ * first `<h1>` where the regular tags are missing or empty. Call this before
+ * {@link extractText}, which modifies the document.
+ */
+export function extractMetadata($: CheerioAPI): PageMetadata {
+  const meta = (selector: string): string | undefined => nonEmpty($(selector).first().attr("content"));
+  return {
+    title: nonEmpty($("title").first().text())
+      ?? meta("meta[property='og:title']")
+      ?? nonEmpty($("h1").first().text())
+      ?? "",
+    description: meta("meta[name='description' i]") ?? meta("meta[property='og:description']"),
+    keywords: meta("meta[name='keywords' i]"),
+  };
+}
+
 /** Whether the page asks search engines not to index it (`<meta name="robots" content="noindex">`). */
 export function isNoindex($: CheerioAPI): boolean {
   return $("meta[name='robots' i]").toArray()

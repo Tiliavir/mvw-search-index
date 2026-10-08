@@ -210,3 +210,30 @@ describe("text extraction", () => {
       .toEqual(["public.html", "draft.html", "none.html"]);
   });
 });
+
+describe("metadata", () => {
+  const store = (html: string) => SearchIndex.createFromHtml([{relative: "p.html", contents: html}]).store["p.html"];
+
+  it("trims title and description", () => {
+    expect(store(`<head><title>
+        Jahreskonzert   2026
+      </title><meta name="description" content="  Das   Konzert "></head>`))
+      .toEqual({title: "Jahreskonzert 2026", description: "Das Konzert"});
+  });
+
+  it("falls back to Open Graph tags", () => {
+    expect(store(`<head><meta property="og:title" content="OG Title">
+      <meta property="og:description" content="OG description"></head>`))
+      .toEqual({title: "OG Title", description: "OG description"});
+  });
+
+  it("falls back to the first h1 for the title and warns when there is none", () => {
+    expect(store("<body><h1>Heading <small>sub</small></h1><h1>Second</h1></body>").title).toBe("Heading sub");
+
+    const warnings: string[] = [];
+    const result = SearchIndex.createFromHtml([{relative: "p.html", contents: "<body>text</body>"}],
+      {logger: {info: () => undefined, warn: (m) => warnings.push(m)}});
+    expect(result.store["p.html"]).toEqual({title: ""});
+    expect(warnings).toHaveLength(1);
+  });
+});
