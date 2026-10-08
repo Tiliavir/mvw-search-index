@@ -3,6 +3,7 @@ import {glob} from "glob";
 import * as fs from "fs";
 import * as lunr from "lunr";
 import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
+import {toHref} from "./href";
 import {DEFAULT_LANGUAGE, languagePlugin} from "./language";
 
 export {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE};
@@ -164,7 +165,7 @@ export class SearchIndex {
       infos.push({
         ...metadata,
         body: extractText(dom, bodySelector || "body", excludeSelector),
-        href: file.relative,
+        href: toHref(file.relative),
       });
     }
 
@@ -192,7 +193,7 @@ export class SearchIndex {
 
   private static async createFromGlobAsync(pattern: string, options: SearchIndexOptions): Promise<ISearchIndexResult> {
     // glob's result order depends on the file system - sort for reproducible output
-    const files = (await glob(pattern, {dotRelative: false, nodir: true})).sort();
+    const files = (await glob(pattern, {dotRelative: false, nodir: true, posix: true})).sort();
     if (files.length === 0 && !options.allowEmpty) {
       throw new Error(`No files match "${pattern}" (relative to ${process.cwd()}). `
         + "Set the allowEmpty option to create an empty index anyway.");

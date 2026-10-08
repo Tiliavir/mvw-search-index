@@ -310,3 +310,12 @@ describe("ranking", () => {
     expect(ranking({boosts: {title: 1, body: 10}})).toEqual(["body.html", "title.html"]);
   });
 });
+
+describe("hrefs", () => {
+  const hrefs = (files: string[], options?: SearchIndexOptions) => Object.keys(SearchIndex.createFromHtml(
+    files.map((relative) => ({relative, contents: "<title>t</title>"})), options).store);
+
+  it("always uses forward slashes", () => {
+    expect(hrefs(["sub\\dir\\page.html"])).toEqual(["sub/dir/page.html"]);
+  });
+});
