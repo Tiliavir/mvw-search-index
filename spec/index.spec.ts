@@ -328,6 +328,7 @@ describe("hrefs", () => {
     expect(hrefs(["a.html", "sub/b.html"], {baseUrl: "/"})).toEqual(["/a.html", "/sub/b.html"]);
     expect(hrefs(["a.html"], {baseUrl: "https://example.org/site"})).toEqual(["https://example.org/site/a.html"]);
     expect(hrefs(["a.html"], {baseUrl: "https://example.org/site/"})).toEqual(["https://example.org/site/a.html"]);
+    expect(hrefs(["a.html"], {baseUrl: "https://example.org/site///"})).toEqual(["https://example.org/site/a.html"]);
   });
 
   it("can strip index.html", () => {

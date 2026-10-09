@@ -12,10 +12,18 @@ export function toHref(relativePath: string, options: HrefOptions = {}): string 
   if (options.stripIndexHtml) {
     href = href.replace(/(^|\/)index\.html?$/, "$1");
   }
-  const baseUrl = options.baseUrl ?? "";
-  if (baseUrl) {
-    href = baseUrl.replace(/\/+$/, "") + "/" + href;
+  const baseUrl = trimTrailingSlashes(options.baseUrl ?? "");
+  if (options.baseUrl) {
+    href = baseUrl + "/" + href;
   }
   // an empty href would link to the search page itself
   return href || "./";
+}
+
+function trimTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value[end - 1] === "/") {
+    end--;
+  }
+  return value.slice(0, end);
 }
