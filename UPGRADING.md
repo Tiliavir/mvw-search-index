@@ -176,6 +176,9 @@ and navigation outside `<main>`, the default makes no difference.
   - Before, read errors crashed the process with a stack trace, and a glob without matches exited with `0`.
 - **`--version`** prints the actual package version, not the hardcoded `2.2.8`.
 - **The destination directory is created** if it doesn't exist.
+- **`<dest>` must be inside the current directory.** A destination outside it (`../site/index.json`, `/tmp/index.json`)
+  is rejected with `Error: <dest> must be a file inside the current directory`. Run the command from your project root,
+  and use `--cwd` to point at the built site.
 - **New flags** for all options: `--cwd`, `--exclude`, `--language`, `--base-url`, `--strip-index-html`,
   `--no-noindex`, `--allow-empty`, `--boost` and `--verbose`. See `mvw-search-index --help` or the
   [README](README.md#cli).

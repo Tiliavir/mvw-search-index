@@ -19,6 +19,20 @@ function parseBoost(value: string, previous: Partial<Record<SearchField, number>
   return {...previous, [match[1]]: Number(match[2])};
 }
 
+/**
+ * Resolves <dest> and makes sure it lies inside the current working directory, so a
+ * mistyped or injected argument (e.g. "../../somewhere") cannot overwrite arbitrary files.
+ */
+function resolveDestination(dest: string): string {
+  const root = process.cwd();
+  const resolved = path.resolve(root, dest);
+  const prefix = root.endsWith(path.sep) ? root : root + path.sep;
+  if (!resolved.startsWith(prefix)) {
+    throw new Error(`<dest> must be a file inside the current directory (${root}), got "${dest}".`);
+  }
+  return resolved;
+}
+
 interface CliOptions {
   cwd?: string;
   exclude: string;
@@ -36,7 +50,7 @@ program
   .description("Generates a lunr search index and result store from HTML files.")
   .version(version)
   .argument("<glob>", "glob pattern of the HTML files to index (quote it, so your shell doesn't expand it)")
-  .argument("<dest>", "path of the JSON file to write")
+  .argument("<dest>", "path of the JSON file to write; must be inside the current directory")
   .argument("[bodySelector]", "CSS selector of the content to index", "body")
   .option("--cwd <dir>", "directory to resolve <glob> in; hrefs are relative to it (use your site's root)")
   .option("-e, --exclude <selector>", "CSS selector of content to leave out (\"\" for none)", DEFAULT_EXCLUDE_SELECTOR)
@@ -67,9 +81,10 @@ program
       logger,
     };
     try {
+      const destination = resolveDestination(dest);
       const index = await SearchIndex.createFromGlob(glob, options);
-      await fs.promises.mkdir(path.dirname(path.resolve(dest)), {recursive: true});
-      await fs.promises.writeFile(dest, JSON.stringify(index));
+      await fs.promises.mkdir(path.dirname(destination), {recursive: true});
+      await fs.promises.writeFile(destination, JSON.stringify(index));
       console.log(`Indexed ${Object.keys(index.store).length} page(s) into ${dest}`);
     } catch (err) {
       console.error(`Error: ${err instanceof Error ? err.message : err}`);
