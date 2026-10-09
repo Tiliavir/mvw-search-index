@@ -215,6 +215,9 @@ This rebuilds `docs/index.json` and serves [./docs](docs): a simple static site 
 
 ## Releases
 
+- **3.0.1**: Fixes all open SonarCloud issues - `node:` imports, `export … from` re-exports, `Object.hasOwn`,
+  `replaceAll`; CI installs with `--ignore-scripts` and pins third-party actions to commit SHAs; the demo page can be
+  zoomed and its search field has a label. No API or behaviour changes.
 - **3.0.0**: Major overhaul - Promise based API, correct text extraction and lunr pipeline (stemming, stop words),
   language support, field boosts, href options, a full-featured CLI. **Breaking** - see [UPGRADING.md](UPGRADING.md).
 - **2.3.2 – 2.3.7**: Dependency updates.
