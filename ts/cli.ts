@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import {InvalidArgumentError, program} from "commander";
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 import {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE, Logger, SearchField, SearchIndex, SearchIndexOptions} from "./index";
 

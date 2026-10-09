@@ -31,12 +31,12 @@ jobs:
       # pre-built gets published, and nothing is published if tests fail.
       - name: Install, build and test
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm test
 
       - name: Publish to NPM
         id: publish
-        uses: JS-DevTools/npm-publish@v4
+        uses: JS-DevTools/npm-publish@0fd2f4369c5d6bcfcde6091a7c527d810b9b5c3f # v4.1.5
         with:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
           strategy: upgrade
