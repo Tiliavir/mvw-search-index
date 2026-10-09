@@ -19,7 +19,7 @@ describe("SearchIndex", () => {
 
     const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
     const r: lunr.Index.Result[] = lnr.search("World*");
-    expect(r.length).toBe(1);
+    expect(r).toHaveLength(1);
     expect(r[0].ref).toBe("filename");
     expect(result.store[r[0].ref].title).toBe("Hello");
   });
@@ -48,7 +48,7 @@ describe("SearchIndex", () => {
 
     const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
     const r: lunr.Index.Result[] = lnr.search("World*");
-    expect(r.length).toBe(1);
+    expect(r).toHaveLength(1);
     expect(r[0].ref).toBe("filename.js");
     expect(result.store[r[0].ref].title).toBe("Hello");
   });
@@ -76,12 +76,12 @@ describe("SearchIndex", () => {
     const lnr: lunr.Index = lunr.Index.load(JSON.parse(JSON.stringify(result.index.toJSON())));
 
     let r: lunr.Index.Result[] = lnr.search("IAmUnique");
-    expect(r.length).toBe(1);
+    expect(r).toHaveLength(1);
     expect(r[0].ref).toBe("docs/foo.html");
     expect(result.store[r[0].ref].title).toBe("Foo Title");
 
     r = lnr.search("NotToBeFound");
-    expect(r.length).toBe(0);
+    expect(r).toHaveLength(0);
   });
 
   it("rejects when a matched file cannot be read", async () => {
@@ -128,8 +128,8 @@ describe("SearchIndex", () => {
     }], {bodySelector: "main"});
 
     const lnr = lunr.Index.load(JSON.parse(JSON.stringify(result.index)));
-    expect(lnr.search("inside").length).toBe(1);
-    expect(lnr.search("outside").length).toBe(0);
+    expect(lnr.search("inside")).toHaveLength(1);
+    expect(lnr.search("outside")).toHaveLength(0);
   });
 });
 
