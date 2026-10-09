@@ -3,12 +3,13 @@ import {glob} from "glob";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as lunr from "lunr";
-import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
-import {HrefOptions, toHref} from "./href";
+import {extractMetadata, extractText, isNoindex} from "./html";
+import {type HrefOptions, toHref} from "./href";
 import {DEFAULT_LANGUAGE, languagePlugin} from "./language";
 
-export {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE};
-export type {HrefOptions};
+export {DEFAULT_EXCLUDE_SELECTOR} from "./html";
+export type {HrefOptions} from "./href";
+export {DEFAULT_LANGUAGE} from "./language";
 
 
 export declare interface IResultStore {
@@ -133,7 +134,7 @@ export class SearchIndex {
     builder.ref("href");
 
     files.forEach((info: IFileInformation): void => {
-      if (Object.prototype.hasOwnProperty.call(this.store, info.href)) {
+      if (Object.hasOwn(this.store, info.href)) {
         throw new Error(`Duplicate href "${info.href}": every document needs a unique href.`);
       }
       this.store[info.href] = {
