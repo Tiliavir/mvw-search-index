@@ -84,6 +84,10 @@ Quote the glob so your shell doesn't expand it. From an npm script:
 
 The CLI exits with code 1 and prints `Error: …` if indexing fails, including when the glob matches no files.
 
+`<dest>` must be inside the directory you run the command from (relative or absolute); anything outside, such as
+`../index.json`, is rejected so a wrong argument can't overwrite unrelated files. `--cwd` only affects where the
+HTML files are read from.
+
 ### Node.js / TypeScript
 
 ```ts
