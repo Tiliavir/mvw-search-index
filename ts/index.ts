@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import {glob} from "glob";
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as lunr from "lunr";
 import {DEFAULT_EXCLUDE_SELECTOR, extractMetadata, extractText, isNoindex} from "./html";
 import {HrefOptions, toHref} from "./href";

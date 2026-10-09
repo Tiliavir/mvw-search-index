@@ -1,5 +1,5 @@
 import {describe, it, expect, vi} from "vitest";
-import * as fs from "fs";
+import * as fs from "node:fs";
 import {IFileInformation, ISearchIndexResult, SearchIndex, SearchIndexOptions} from "../ts";
 import * as lunr from "lunr";
 
