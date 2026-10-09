@@ -8,7 +8,7 @@ export declare interface HrefOptions {
 /** Turns the path of an indexed file into the `href` of its search result. */
 export function toHref(relativePath: string, options: HrefOptions = {}): string {
   // Windows paths use backslashes, URLs never do.
-  let href = relativePath.replace(/\\/g, "/").replace(/^\.\//, "");
+  let href = relativePath.replaceAll("\\", "/").replace(/^\.\//, "");
   if (options.stripIndexHtml) {
     href = href.replace(/(^|\/)index\.html?$/, "$1");
   }
