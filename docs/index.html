@@ -20,6 +20,15 @@
       max-width: 100%
     }
 
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap
+    }
+
     .results {
       padding-left: 0
     }
@@ -45,7 +54,8 @@
 
 <div>
   <form>
-    <input aria-label="Search" class="mvw-search-field" name="query" placeholder="Search..." type="search">
+    <label class="visually-hidden" for="query">Search</label>
+    <input class="mvw-search-field" id="query" name="query" placeholder="Search..." type="search">
   </form>
 
   <ol class="results"></ol>
