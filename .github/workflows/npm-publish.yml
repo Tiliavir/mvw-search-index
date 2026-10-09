@@ -31,7 +31,7 @@ jobs:
       # pre-built gets published, and nothing is published if tests fail.
       - name: Install, build and test
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm test
 
       - name: Publish to NPM

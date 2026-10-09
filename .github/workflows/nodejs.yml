@@ -26,7 +26,7 @@ jobs:
 
       - name: Install, lint, build and test
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm test
 
   # Merge Dependabot PRs automatically - but only after the full test matrix
