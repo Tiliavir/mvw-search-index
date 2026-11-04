@@ -44,7 +44,7 @@
     "commander": "15.0.0",
     "glob": "14.0.3",
     "lunr": "2.3.9",
-    "lunr-languages": "1.23.0"
+    "lunr-languages": "1.24.0"
   },
   "scripts": {
     "prepare": "npm run build",
