@@ -1,17 +1,19 @@
-import {describe, it, expect, vi} from "vitest";
 import * as fs from "node:fs";
-import {IFileInformation, ISearchIndexResult, SearchIndex, SearchIndexOptions} from "../ts";
 import * as lunr from "lunr";
+import {describe, expect, it, vi} from "vitest";
+import {type IFileInformation, type ISearchIndexResult, SearchIndex, type SearchIndexOptions} from "../ts";
 
 describe("SearchIndex", () => {
   it("tests that an added item is in the resulting index", () => {
-    const meta: IFileInformation[] = [{
-      "body": "Hello World!",
-      "description": "test",
-      "keywords": "a, b, c",
-      "href": "filename",
-      "title": "Hello"
-    }];
+    const meta: IFileInformation[] = [
+      {
+        body: "Hello World!",
+        description: "test",
+        keywords: "a, b, c",
+        href: "filename",
+        title: "Hello",
+      },
+    ];
     const result: ISearchIndexResult = SearchIndex.createFromInfo(meta);
 
     expect(result.store).toEqual({filename: {description: "test", title: "Hello"}});
@@ -38,10 +40,12 @@ describe("SearchIndex", () => {
            </html>
            `;
 
-    const result: ISearchIndexResult = SearchIndex.createFromHtml([{
-      relative: "filename.js",
-      contents: Buffer.from(htmlFile)
-    }]);
+    const result: ISearchIndexResult = SearchIndex.createFromHtml([
+      {
+        relative: "filename.js",
+        contents: Buffer.from(htmlFile),
+      },
+    ]);
 
     expect(result.store).toEqual({"filename.js": {description: "test", title: "Hello"}});
     expect(result.index).toBeDefined();
@@ -56,20 +60,20 @@ describe("SearchIndex", () => {
   it("tests that files are read and represented in the resulting index", async () => {
     const result: ISearchIndexResult = await SearchIndex.createFromGlob("docs/**/*.html", "body.to-be-indexed");
     expect(result.store).toEqual({
-        'docs/foo.html': {
-          description: 'This is the description of foo.html that will be indexed and used as a summary ;-)',
-          title: 'Foo Title'
-        },
-        'docs/index.html': {
-          description: 'This is the description of the index.html landing page that will be indexed and used as a summary ;-)',
-          title: 'Search Page'
-        },
-        'docs/sub/index.html': {
-          description: 'This is the description of sub/index.html that will be indexed and used as a summary ;-)',
-          title: 'Sub Page Title'
-        }
-      }
-    );
+      "docs/foo.html": {
+        description: "This is the description of foo.html that will be indexed and used as a summary ;-)",
+        title: "Foo Title",
+      },
+      "docs/index.html": {
+        description:
+          "This is the description of the index.html landing page that will be indexed and used as a summary ;-)",
+        title: "Search Page",
+      },
+      "docs/sub/index.html": {
+        description: "This is the description of sub/index.html that will be indexed and used as a summary ;-)",
+        title: "Sub Page Title",
+      },
+    });
     expect(Object.keys(result.store)).toEqual(["docs/foo.html", "docs/index.html", "docs/sub/index.html"]);
     expect(result.index).toBeDefined();
 
@@ -100,7 +104,9 @@ describe("SearchIndex", () => {
       await SearchIndex.createFromGlob("docs/foo.html");
       expect(consoleSpy).not.toHaveBeenCalled();
 
-      await SearchIndex.createFromGlob("docs/foo.html", {logger: {info: (m) => messages.push(m), warn: () => undefined}});
+      await SearchIndex.createFromGlob("docs/foo.html", {
+        logger: {info: (m) => messages.push(m), warn: () => undefined},
+      });
       expect(messages).toEqual(["Indexing docs/foo.html"]);
     } finally {
       consoleSpy.mockRestore();
@@ -122,10 +128,15 @@ describe("SearchIndex", () => {
   });
 
   it("accepts an options object and string contents", () => {
-    const result: ISearchIndexResult = SearchIndex.createFromHtml([{
-      relative: "a.html",
-      contents: "<html><head><title>A</title></head><body><main>inside</main><p>outside</p></body></html>",
-    }], {bodySelector: "main"});
+    const result: ISearchIndexResult = SearchIndex.createFromHtml(
+      [
+        {
+          relative: "a.html",
+          contents: "<html><head><title>A</title></head><body><main>inside</main><p>outside</p></body></html>",
+        },
+      ],
+      {bodySelector: "main"},
+    );
 
     const lnr = lunr.Index.load(JSON.parse(JSON.stringify(result.index)));
     expect(lnr.search("inside")).toHaveLength(1);
@@ -144,7 +155,9 @@ function hits(index: lunr.Index, query: string): number {
 
 describe("text extraction", () => {
   it("separates the text of adjacent block elements", () => {
-    const index = indexHtml("<body><ul><li>Trompete</li><li>Posaune</li></ul><h1>Probe</h1><p>Mittwoch<br>Abend</p></body>");
+    const index = indexHtml(
+      "<body><ul><li>Trompete</li><li>Posaune</li></ul><h1>Probe</h1><p>Mittwoch<br>Abend</p></body>",
+    );
     for (const word of ["Trompete", "Posaune", "Probe", "Mittwoch", "Abend"]) {
       expect(hits(index, word), word).toBe(1);
     }
@@ -202,12 +215,21 @@ describe("text extraction", () => {
   it("skips pages marked noindex unless told otherwise", () => {
     const files = [
       {relative: "public.html", contents: "<head><title>Public</title></head><body>visible</body>"},
-      {relative: "draft.html", contents: "<head><meta name='Robots' content='NOINDEX, follow'><title>Draft</title></head><body>hidden</body>"},
-      {relative: "none.html", contents: "<head><meta name='robots' content='none'><title>None</title></head><body>hidden</body>"},
+      {
+        relative: "draft.html",
+        contents: "<head><meta name='Robots' content='NOINDEX, follow'><title>Draft</title></head><body>hidden</body>",
+      },
+      {
+        relative: "none.html",
+        contents: "<head><meta name='robots' content='none'><title>None</title></head><body>hidden</body>",
+      },
     ];
     expect(Object.keys(SearchIndex.createFromHtml(files).store)).toEqual(["public.html"]);
-    expect(Object.keys(SearchIndex.createFromHtml(files, {respectNoindex: false}).store))
-      .toEqual(["public.html", "draft.html", "none.html"]);
+    expect(Object.keys(SearchIndex.createFromHtml(files, {respectNoindex: false}).store)).toEqual([
+      "public.html",
+      "draft.html",
+      "none.html",
+    ]);
   });
 });
 
@@ -215,31 +237,35 @@ describe("metadata", () => {
   const store = (html: string) => SearchIndex.createFromHtml([{relative: "p.html", contents: html}]).store["p.html"];
 
   it("trims title and description", () => {
-    expect(store(`<head><title>
+    expect(
+      store(`<head><title>
         Jahreskonzert   2026
-      </title><meta name="description" content="  Das   Konzert "></head>`))
-      .toEqual({title: "Jahreskonzert 2026", description: "Das Konzert"});
+      </title><meta name="description" content="  Das   Konzert "></head>`),
+    ).toEqual({title: "Jahreskonzert 2026", description: "Das Konzert"});
   });
 
   it("falls back to Open Graph tags", () => {
-    expect(store(`<head><meta property="og:title" content="OG Title">
-      <meta property="og:description" content="OG description"></head>`))
-      .toEqual({title: "OG Title", description: "OG description"});
+    expect(
+      store(`<head><meta property="og:title" content="OG Title">
+      <meta property="og:description" content="OG description"></head>`),
+    ).toEqual({title: "OG Title", description: "OG description"});
   });
 
   it("falls back to the first h1 for the title and warns when there is none", () => {
     expect(store("<body><h1>Heading <small>sub</small></h1><h1>Second</h1></body>").title).toBe("Heading sub");
 
     const warnings: string[] = [];
-    const result = SearchIndex.createFromHtml([{relative: "p.html", contents: "<body>text</body>"}],
-      {logger: {info: () => undefined, warn: (m) => warnings.push(m)}});
+    const result = SearchIndex.createFromHtml([{relative: "p.html", contents: "<body>text</body>"}], {
+      logger: {info: () => undefined, warn: (m) => warnings.push(m)},
+    });
     expect(result.store["p.html"]).toEqual({title: ""});
     expect(warnings).toHaveLength(1);
   });
 });
 
 describe("text processing", () => {
-  const index = () => indexHtml(`<head><title>Concerts</title><meta name="keywords" content="Blasmusik, Konzert"></head>
+  const index = () =>
+    indexHtml(`<head><title>Concerts</title><meta name="keywords" content="Blasmusik, Konzert"></head>
     <body><p>The band is running rehearsals. Call Markus: info@example.org!</p></body>`);
 
   it("stems words, so different forms of a word match", () => {
@@ -300,7 +326,8 @@ describe("ranking", () => {
   ];
   const ranking = (options?: SearchIndexOptions) =>
     lunr.Index.load(JSON.parse(JSON.stringify(SearchIndex.createFromInfo(files, options).index)))
-      .search("Jahreskonzert").map((r) => r.ref);
+      .search("Jahreskonzert")
+      .map((r) => r.ref);
 
   it("ranks title matches above body matches by default", () => {
     expect(ranking()).toEqual(["title.html", "body.html"]);
@@ -312,8 +339,13 @@ describe("ranking", () => {
 });
 
 describe("hrefs", () => {
-  const hrefs = (files: string[], options?: SearchIndexOptions) => Object.keys(SearchIndex.createFromHtml(
-    files.map((relative) => ({relative, contents: "<title>t</title>"})), options).store);
+  const hrefs = (files: string[], options?: SearchIndexOptions) =>
+    Object.keys(
+      SearchIndex.createFromHtml(
+        files.map((relative) => ({relative, contents: "<title>t</title>"})),
+        options,
+      ).store,
+    );
 
   it("always uses forward slashes", () => {
     expect(hrefs(["sub\\dir\\page.html"])).toEqual(["sub/dir/page.html"]);
@@ -332,16 +364,21 @@ describe("hrefs", () => {
   });
 
   it("can strip index.html", () => {
-    expect(hrefs(["index.html", "sub/index.html", "sub/other.html", "myindex.html"], {stripIndexHtml: true}))
-      .toEqual(["./", "sub/", "sub/other.html", "myindex.html"]);
-    expect(hrefs(["index.html", "sub/index.html"], {stripIndexHtml: true, baseUrl: "/"}))
-      .toEqual(["/", "/sub/"]);
+    expect(hrefs(["index.html", "sub/index.html", "sub/other.html", "myindex.html"], {stripIndexHtml: true})).toEqual([
+      "./",
+      "sub/",
+      "sub/other.html",
+      "myindex.html",
+    ]);
+    expect(hrefs(["index.html", "sub/index.html"], {stripIndexHtml: true, baseUrl: "/"})).toEqual(["/", "/sub/"]);
   });
 
   it("must be unique", () => {
-    expect(() => SearchIndex.createFromInfo([
-      {href: "x", title: "A", body: "alpha"},
-      {href: "x", title: "B", body: "beta"},
-    ])).toThrow(/Duplicate href "x"/);
+    expect(() =>
+      SearchIndex.createFromInfo([
+        {href: "x", title: "A", body: "alpha"},
+        {href: "x", title: "B", body: "beta"},
+      ]),
+    ).toThrow(/Duplicate href "x"/);
   });
 });

@@ -1,16 +1,15 @@
-import * as cheerio from "cheerio";
-import {glob} from "glob";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as cheerio from "cheerio";
+import {glob} from "glob";
 import * as lunr from "lunr";
-import {extractMetadata, extractText, isNoindex} from "./html";
 import {type HrefOptions, toHref} from "./href";
+import {extractMetadata, extractText, isNoindex} from "./html";
 import {DEFAULT_LANGUAGE, languagePlugin} from "./language";
 
-export {DEFAULT_EXCLUDE_SELECTOR} from "./html";
 export type {HrefOptions} from "./href";
+export {DEFAULT_EXCLUDE_SELECTOR} from "./html";
 export {DEFAULT_LANGUAGE} from "./language";
-
 
 export declare interface IResultStore {
   [key: string]: {
@@ -191,14 +190,18 @@ export class SearchIndex {
    * @param options Options, or - for backwards compatibility - just the body selector.
    * @returns The index and result store. Rejects if a file cannot be read.
    */
-  public static createFromGlob(pattern: string,
-                               options?: string | SearchIndexOptions,
-                               ...legacyCallback: never[]): Promise<ISearchIndexResult> {
+  public static createFromGlob(
+    pattern: string,
+    options?: string | SearchIndexOptions,
+    ...legacyCallback: never[]
+  ): Promise<ISearchIndexResult> {
     if (legacyCallback.length > 0) {
       // 2.x took a callback as third argument. Silently ignoring it would mean the
       // caller's index is simply never written - fail loudly instead.
-      throw new TypeError("SearchIndex.createFromGlob() no longer accepts a callback; it returns a Promise. "
-        + "See https://github.com/Tiliavir/mvw-search-index/blob/main/UPGRADING.md");
+      throw new TypeError(
+        "SearchIndex.createFromGlob() no longer accepts a callback; it returns a Promise. " +
+          "See https://github.com/Tiliavir/mvw-search-index/blob/main/UPGRADING.md",
+      );
     }
     return SearchIndex.createFromGlobAsync(pattern, normalizeOptions(options));
   }
@@ -206,16 +209,20 @@ export class SearchIndex {
   private static async createFromGlobAsync(pattern: string, options: SearchIndexOptions): Promise<ISearchIndexResult> {
     const cwd = path.resolve(options.cwd ?? ".");
     // glob's result order depends on the file system - sort for reproducible output
-    const files = (await glob(pattern, {cwd, dotRelative: false, nodir: true, posix: true}))
-      .sort((a, b) => a.localeCompare(b, "en"));
+    const files = (await glob(pattern, {cwd, dotRelative: false, nodir: true, posix: true})).sort((a, b) =>
+      a.localeCompare(b, "en"),
+    );
     if (files.length === 0 && !options.allowEmpty) {
-      throw new Error(`No files match "${pattern}" in ${cwd}. `
-        + "Set the allowEmpty option to create an empty index anyway.");
+      throw new Error(
+        `No files match "${pattern}" in ${cwd}. Set the allowEmpty option to create an empty index anyway.`,
+      );
     }
-    const readFiles: HtmlFile[] = await Promise.all(files.map(async (file) => ({
-      relative: file,
-      contents: await fs.promises.readFile(path.join(cwd, file)),
-    })));
+    const readFiles: HtmlFile[] = await Promise.all(
+      files.map(async (file) => ({
+        relative: file,
+        contents: await fs.promises.readFile(path.join(cwd, file)),
+      })),
+    );
     return SearchIndex.createFromHtml(readFiles, options);
   }
 

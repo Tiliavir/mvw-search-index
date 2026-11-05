@@ -5,6 +5,7 @@ import type {CheerioAPI} from "cheerio";
  * must be separated from the surrounding text, otherwise `<li>a</li><li>b</li>`
  * becomes the single word "ab".
  */
+// biome-ignore format: keep the element list compact
 const BLOCK_ELEMENTS: string = [
   "address", "article", "aside", "blockquote", "caption", "dd", "details", "dialog", "div", "dl", "dt",
   "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header",
@@ -39,10 +40,11 @@ function nonEmpty(value: string | undefined): string | undefined {
 export function extractMetadata($: CheerioAPI): PageMetadata {
   const meta = (selector: string): string | undefined => nonEmpty($(selector).first().attr("content"));
   return {
-    title: nonEmpty($("title").first().text())
-      ?? meta("meta[property='og:title']")
-      ?? nonEmpty($("h1").first().text())
-      ?? "",
+    title:
+      nonEmpty($("title").first().text()) ??
+      meta("meta[property='og:title']") ??
+      nonEmpty($("h1").first().text()) ??
+      "",
     description: meta("meta[name='description' i]") ?? meta("meta[property='og:description']"),
     keywords: meta("meta[name='keywords' i]"),
   };
@@ -50,7 +52,8 @@ export function extractMetadata($: CheerioAPI): PageMetadata {
 
 /** Whether the page asks search engines not to index it (`<meta name="robots" content="noindex">`). */
 export function isNoindex($: CheerioAPI): boolean {
-  return $("meta[name='robots' i]").toArray()
+  return $("meta[name='robots' i]")
+    .toArray()
     .some((meta) => /\b(noindex|none)\b/i.test($(meta).attr("content") ?? ""));
 }
 
@@ -64,7 +67,11 @@ export const DEFAULT_EXCLUDE_SELECTOR = "nav, footer";
  *
  * Note: modifies the document.
  */
-export function extractText($: CheerioAPI, selector: string, excludeSelector: string = DEFAULT_EXCLUDE_SELECTOR): string {
+export function extractText(
+  $: CheerioAPI,
+  selector: string,
+  excludeSelector: string = DEFAULT_EXCLUDE_SELECTOR,
+): string {
   $(NON_CONTENT_ELEMENTS).remove();
   $("br").replaceWith(" ");
   $(BLOCK_ELEMENTS).prepend(" ").append(" ");
@@ -76,5 +83,10 @@ export function extractText($: CheerioAPI, selector: string, excludeSelector: st
     // only descendants: a body selector that itself matches the exclusion still works
     roots.find(excludeSelector).remove();
   }
-  return normalizeWhitespace(roots.map((_, el) => $(el).text()).get().join(" "));
+  return normalizeWhitespace(
+    roots
+      .map((_, el) => $(el).text())
+      .get()
+      .join(" "),
+  );
 }

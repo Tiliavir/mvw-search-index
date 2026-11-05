@@ -14,7 +14,7 @@ export function toHref(relativePath: string, options: HrefOptions = {}): string 
   }
   const baseUrl = trimTrailingSlashes(options.baseUrl ?? "");
   if (options.baseUrl) {
-    href = baseUrl + "/" + href;
+    href = `${baseUrl}/${href}`;
   }
   // an empty href would link to the search page itself
   return href || "./";

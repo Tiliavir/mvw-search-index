@@ -3,7 +3,6 @@ import type * as Lunr from "lunr";
 // lunr-languages plugins register themselves by mutating the lunr module object, so
 // they need the actual CommonJS export - an ES namespace wrapper (as created by
 // bundlers and test runners for `import * as`) would silently drop the additions.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const lunr: typeof Lunr = require("lunr");
 
 /** lunr's built-in language; needs no plugin. */
@@ -27,15 +26,18 @@ export function languagePlugin(language: string): Lunr.Builder.Plugin | undefine
   if (!registry[language]) {
     try {
       if (!stemmerSupportLoaded) {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports -- loaded on demand, synchronously
+        // loaded on demand, synchronously
         require("lunr-languages/lunr.stemmer.support")(lunr);
         stemmerSupportLoaded = true;
       }
-      // eslint-disable-next-line @typescript-eslint/no-require-imports -- loaded on demand, synchronously
+      // loaded on demand, synchronously
       require(`lunr-languages/lunr.${language}`)(lunr);
     } catch (err) {
-      throw new Error(`Unsupported language "${language}": ${err instanceof Error ? err.message : err}. `
-        + "See https://github.com/MihaiValentin/lunr-languages for the supported languages.", {cause: err});
+      throw new Error(
+        `Unsupported language "${language}": ${err instanceof Error ? err.message : err}. ` +
+          "See https://github.com/MihaiValentin/lunr-languages for the supported languages.",
+        {cause: err},
+      );
     }
   }
   const plugin = registry[language];
