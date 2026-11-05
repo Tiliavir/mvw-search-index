@@ -1,8 +1,8 @@
-import {describe, it, expect} from "vitest";
 import {spawnSync} from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
+import {describe, expect, it} from "vitest";
 
 // Runs the compiled CLI - `npm test` builds before running the specs.
 const repo = path.join(__dirname, "..");
@@ -27,8 +27,16 @@ describe("CLI", () => {
 
   it("writes the index, creating missing directories, and prints a summary", () => {
     const work = workDir();
-    const {code, stdout} = run(work, "**/*.html", "nested/dir/index.json", "body.to-be-indexed",
-      "--cwd", docs, "--base-url", "/");
+    const {code, stdout} = run(
+      work,
+      "**/*.html",
+      "nested/dir/index.json",
+      "body.to-be-indexed",
+      "--cwd",
+      docs,
+      "--base-url",
+      "/",
+    );
     expect(code).toBe(0);
     expect(stdout.trim()).toBe("Indexed 3 page(s) into nested/dir/index.json");
 

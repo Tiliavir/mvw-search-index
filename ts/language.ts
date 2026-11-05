@@ -34,8 +34,11 @@ export function languagePlugin(language: string): Lunr.Builder.Plugin | undefine
       // eslint-disable-next-line @typescript-eslint/no-require-imports -- loaded on demand, synchronously
       require(`lunr-languages/lunr.${language}`)(lunr);
     } catch (err) {
-      throw new Error(`Unsupported language "${language}": ${err instanceof Error ? err.message : err}. `
-        + "See https://github.com/MihaiValentin/lunr-languages for the supported languages.", {cause: err});
+      throw new Error(
+        `Unsupported language "${language}": ${err instanceof Error ? err.message : err}. ` +
+          "See https://github.com/MihaiValentin/lunr-languages for the supported languages.",
+        {cause: err},
+      );
     }
   }
   const plugin = registry[language];

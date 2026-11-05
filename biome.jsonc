@@ -7,7 +7,7 @@
   },
   "files": {
     // docs/ is the demo site with a generated index.json
-    "includes": ["**", "!docs", "!package-lock.json"]
+    "includes": ["**", "!docs", "!package-lock.json", "!**/*.md"]
   },
   "formatter": {
     "enabled": true,

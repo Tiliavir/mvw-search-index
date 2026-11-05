@@ -1,17 +1,27 @@
 #!/usr/bin/env node
 
-import {InvalidArgumentError, program} from "commander";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import {InvalidArgumentError, program} from "commander";
 
-import {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE, type Logger, type SearchField, SearchIndex, type SearchIndexOptions} from "./index";
+import {
+  DEFAULT_EXCLUDE_SELECTOR,
+  DEFAULT_LANGUAGE,
+  type Logger,
+  type SearchField,
+  SearchIndex,
+  type SearchIndexOptions,
+} from "./index";
 
 // read at runtime: package.json is outside of the compiled sources
 const {version} = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
 
 const FIELDS: SearchField[] = ["title", "keywords", "description", "body"];
 
-function parseBoost(value: string, previous: Partial<Record<SearchField, number>> = {}): Partial<Record<SearchField, number>> {
+function parseBoost(
+  value: string,
+  previous: Partial<Record<SearchField, number>> = {},
+): Partial<Record<SearchField, number>> {
   const match = /^(\w+)=(\d+(?:\.\d+)?)$/.exec(value);
   if (!match || !FIELDS.includes(match[1] as SearchField)) {
     throw new InvalidArgumentError(`Expected <field>=<number> with field one of ${FIELDS.join(", ")}.`);
@@ -53,14 +63,17 @@ program
   .argument("<dest>", "path of the JSON file to write; must be inside the current directory")
   .argument("[bodySelector]", "CSS selector of the content to index", "body")
   .option("--cwd <dir>", "directory to resolve <glob> in; hrefs are relative to it (use your site's root)")
-  .option("-e, --exclude <selector>", "CSS selector of content to leave out (\"\" for none)", DEFAULT_EXCLUDE_SELECTOR)
+  .option("-e, --exclude <selector>", 'CSS selector of content to leave out ("" for none)', DEFAULT_EXCLUDE_SELECTOR)
   .option("-l, --language <code>", "two-letter content language, selects stemmer and stop words", DEFAULT_LANGUAGE)
-  .option("--base-url <url>", "prefix for all hrefs, e.g. \"/\"")
-  .option("--strip-index-html", "link to \"dir/\" instead of \"dir/index.html\"")
-  .option("--no-noindex", "also index pages marked <meta name=\"robots\" content=\"noindex\">")
+  .option("--base-url <url>", 'prefix for all hrefs, e.g. "/"')
+  .option("--strip-index-html", 'link to "dir/" instead of "dir/index.html"')
+  .option("--no-noindex", 'also index pages marked <meta name="robots" content="noindex">')
   .option("--allow-empty", "write an empty index instead of failing if <glob> matches no files")
-  .option("-b, --boost <field=number>", "weight of a field, repeatable (default title=5 keywords=3 description=2 body=1)",
-    parseBoost)
+  .option(
+    "-b, --boost <field=number>",
+    "weight of a field, repeatable (default title=5 keywords=3 description=2 body=1)",
+    parseBoost,
+  )
   .option("-v, --verbose", "list every indexed file")
   .showHelpAfterError()
   .action(async (glob: string, dest: string, bodySelector: string, cli: CliOptions) => {
