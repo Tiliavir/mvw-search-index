@@ -4,7 +4,7 @@ import {InvalidArgumentError, program} from "commander";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE, Logger, SearchField, SearchIndex, SearchIndexOptions} from "./index";
+import {DEFAULT_EXCLUDE_SELECTOR, DEFAULT_LANGUAGE, type Logger, type SearchField, SearchIndex, type SearchIndexOptions} from "./index";
 
 // read at runtime: package.json is outside of the compiled sources
 const {version} = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));

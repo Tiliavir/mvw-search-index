@@ -1,6 +1,6 @@
 import {describe, it, expect, vi} from "vitest";
 import * as fs from "node:fs";
-import {IFileInformation, ISearchIndexResult, SearchIndex, SearchIndexOptions} from "../ts";
+import {type IFileInformation, type ISearchIndexResult, SearchIndex, type SearchIndexOptions} from "../ts";
 import * as lunr from "lunr";
 
 describe("SearchIndex", () => {

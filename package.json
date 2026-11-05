@@ -30,13 +30,11 @@
     "node": ">=22.12.0"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
+    "@biomejs/biome": "2.6.5",
     "@types/lunr": "2.3.7",
     "@types/node": "26.6.6",
-    "eslint": "10.14.0",
     "serve": "14.2.6",
-    "typescript": "6.0.3",
-    "typescript-eslint": "8.72.1",
+    "typescript": "7.0.2",
     "vitest": "5.0.5"
   },
   "dependencies": {
@@ -49,10 +47,11 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc -p ./ts",
-    "lint": "eslint . && tsc -p spec",
+    "lint": "biome check . && tsc -p spec",
     "test": "npm run lint && npm run build && vitest run",
     "preserve": "node js/cli.js '**/*.html' docs/index.json 'body.to-be-indexed' --cwd docs",
-    "serve": "serve docs"
+    "serve": "serve docs",
+    "format": "biome check --write ."
   },
   "repository": {
     "type": "git",
