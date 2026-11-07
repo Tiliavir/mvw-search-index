@@ -60,5 +60,9 @@
   "bugs": {
     "url": "https://github.com/tiliavir/mvw-search-index/issues"
   },
-  "homepage": "https://github.com/tiliavir/mvw-search-index#readme"
+  "homepage": "https://github.com/tiliavir/mvw-search-index#readme",
+  "//": "overrides.compression: serve@14.2.x pins compression@1.8.1 (GHSA memory-leak DoS). Remove this override once serve depends on compression >=1.8.2.",
+  "overrides": {
+    "compression": "1.8.2"
+  }
 }
