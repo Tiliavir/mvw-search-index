@@ -30,7 +30,7 @@
     "node": ">=22.12.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.6",
+    "@biomejs/biome": "2.6.7",
     "@types/lunr": "2.3.7",
     "@types/node": "26.6.6",
     "serve": "14.2.7",
@@ -40,7 +40,7 @@
   "dependencies": {
     "cheerio": "1.2.0",
     "commander": "15.1.0",
-    "glob": "14.0.4",
+    "glob": "14.0.6",
     "lunr": "2.3.9",
     "lunr-languages": "1.24.0"
   },
