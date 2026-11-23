@@ -35,7 +35,7 @@
     "@types/node": "26.6.6",
     "serve": "14.2.8",
     "typescript": "7.0.2",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   },
   "dependencies": {
     "cheerio": "1.2.0",
